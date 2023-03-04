@@ -1,13 +1,12 @@
 # Core naming module
 # Generates consistent resource names across cloud providers.
-
-locals {
-  separator = "-"
-  name_parts = compact([
-    var.project,
-    var.environment,
-    var.component,
-    var.suffix,
-  ])
-  resource_name = join(local.separator, local.name_parts)
-}
+#
+# Usage:
+#   module "naming" {
+#     source      = "../../modules/core/naming"
+#     project     = "myplatform"
+#     environment = "dev"
+#     component   = "vpc"
+#   }
+#
+# Outputs: resource_name = "myplatform-dev-vpc"
