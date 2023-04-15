@@ -26,3 +26,7 @@ Thumbs.db
 
 # Local tooling
 CLAUDE*
+.claude/
+
+# Test artifacts
+.test/
