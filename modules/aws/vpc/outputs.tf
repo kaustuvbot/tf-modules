@@ -25,5 +25,15 @@ output "internet_gateway_id" {
 
 output "nat_gateway_ids" {
   description = "List of NAT gateway IDs"
-  value       = [] # Will be populated when NAT gateways are added
+  value       = aws_nat_gateway.this[*].id
+}
+
+output "public_route_table_id" {
+  description = "The ID of the public route table"
+  value       = length(aws_route_table.public) > 0 ? aws_route_table.public[0].id : null
+}
+
+output "private_route_table_ids" {
+  description = "List of private route table IDs"
+  value       = aws_route_table.private[*].id
 }
