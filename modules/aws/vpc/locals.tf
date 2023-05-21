@@ -14,5 +14,10 @@ locals {
   private_subnet_count = length(var.private_subnet_cidrs)
 
   # NAT gateway count: 0 if disabled, 1 if single, or per-AZ
-  nat_gateway_count = var.enable_nat_gateway ? (var.single_nat_gateway ? 1 : local.az_count) : 0
+  # Also requires public subnets to exist (NAT sits in a public subnet)
+  nat_gateway_count = (
+    var.enable_nat_gateway && local.public_subnet_count > 0
+    ? (var.single_nat_gateway ? 1 : local.az_count)
+    : 0
+  )
 }
