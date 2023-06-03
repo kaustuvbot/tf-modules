@@ -1,0 +1,62 @@
+name: Terraform Validate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "modules/**"
+      - "environments/**"
+      - "bootstrap/**"
+      - "examples/**"
+      - "*.tf"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fmt:
+    name: Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.4.0"
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive -diff
+
+  validate:
+    name: Validate Modules
+    runs-on: ubuntu-latest
+    needs: fmt
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - modules/aws/vpc
+          - modules/aws/s3-state
+          - modules/aws/dynamodb-lock
+          - modules/aws/iam
+          - modules/core/naming
+          - modules/core/tagging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.4.0"
+
+      - name: Terraform Init
+        working-directory: ${{ matrix.module }}
+        run: terraform init -backend=false
+
+      - name: Terraform Validate
+        working-directory: ${{ matrix.module }}
+        run: terraform validate
