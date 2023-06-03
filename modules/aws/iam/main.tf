@@ -12,9 +12,14 @@
 locals {
   github_oidc_url = "https://token.actions.githubusercontent.com"
 
-  # Build sub claims for each repo: "repo:org/repo:*"
-  oidc_sub_claims = [
+  # Plan role: allow any ref (PRs, branches)
+  plan_sub_claims = [
     for repo in var.github_repositories : "repo:${repo}:*"
+  ]
+
+  # Apply role: restrict to main/default branch only
+  apply_sub_claims = [
+    for repo in var.github_repositories : "repo:${repo}:ref:refs/heads/${var.apply_branch}"
   ]
 
   common_tags = merge(
@@ -69,14 +74,16 @@ data "aws_iam_policy_document" "plan_assume_role" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = local.oidc_sub_claims
+      values   = local.plan_sub_claims
     }
   }
 }
 
 resource "aws_iam_role" "plan" {
-  name               = "${var.project}-${var.environment}-ci-plan"
-  assume_role_policy = data.aws_iam_policy_document.plan_assume_role.json
+  name                 = "${var.project}-${var.environment}-ci-plan"
+  assume_role_policy   = data.aws_iam_policy_document.plan_assume_role.json
+  max_session_duration = var.max_session_duration
+  permissions_boundary = var.permissions_boundary_arn
 
   tags = merge(local.common_tags, {
     Name = "${var.project}-${var.environment}-ci-plan"
@@ -90,7 +97,7 @@ resource "aws_iam_role_policy_attachment" "plan_read_only" {
 }
 
 # -----------------------------------------------------------------------------
-# CI Apply Role (read-write)
+# CI Apply Role (read-write, restricted to default branch)
 # -----------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "apply_assume_role" {
@@ -110,16 +117,18 @@ data "aws_iam_policy_document" "apply_assume_role" {
     }
 
     condition {
-      test     = "StringLike"
+      test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = local.oidc_sub_claims
+      values   = local.apply_sub_claims
     }
   }
 }
 
 resource "aws_iam_role" "apply" {
-  name               = "${var.project}-${var.environment}-ci-apply"
-  assume_role_policy = data.aws_iam_policy_document.apply_assume_role.json
+  name                 = "${var.project}-${var.environment}-ci-apply"
+  assume_role_policy   = data.aws_iam_policy_document.apply_assume_role.json
+  max_session_duration = var.max_session_duration
+  permissions_boundary = var.permissions_boundary_arn
 
   tags = merge(local.common_tags, {
     Name = "${var.project}-${var.environment}-ci-apply"

@@ -33,6 +33,29 @@ variable "github_repositories" {
   }
 }
 
+variable "apply_branch" {
+  description = "Branch name that the apply role is restricted to (e.g., main)"
+  type        = string
+  default     = "main"
+}
+
+variable "max_session_duration" {
+  description = "Maximum session duration in seconds for CI roles (1h–12h)"
+  type        = number
+  default     = 3600
+
+  validation {
+    condition     = var.max_session_duration >= 3600 && var.max_session_duration <= 43200
+    error_message = "Session duration must be between 3600 (1h) and 43200 (12h) seconds."
+  }
+}
+
+variable "permissions_boundary_arn" {
+  description = "ARN of an IAM policy to use as permissions boundary for CI roles (optional)"
+  type        = string
+  default     = null
+}
+
 variable "tags" {
   description = "Additional tags to apply to all IAM resources"
   type        = map(string)
