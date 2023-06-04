@@ -1,5 +1,8 @@
 # tf-modules
 
+![Terraform Validate](https://github.com/YOUR_ORG/tf-modules/actions/workflows/terraform-validate.yml/badge.svg)
+![Terraform Plan](https://github.com/YOUR_ORG/tf-modules/actions/workflows/terraform-plan.yml/badge.svg)
+
 Production-grade Terraform modules for multi-cloud infrastructure.
 
 ## Vision
@@ -10,7 +13,7 @@ A modular, reusable Terraform platform that provides consistent infrastructure p
 
 | Cloud | Status | Key Modules |
 |-------|--------|-------------|
-| AWS | Planned | VPC, EKS, IAM/OIDC, logging, budgets |
+| AWS | In Progress | VPC, IAM/OIDC, EKS, logging, budgets |
 | Azure | Planned | Resource Group, VNet, AKS, Key Vault, monitoring |
 | GCP | Future | VPC, GKE, IAM, logging |
 
