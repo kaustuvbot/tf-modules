@@ -207,3 +207,90 @@ resource "aws_cloudtrail" "this" {
 
   depends_on = [aws_s3_bucket_policy.cloudtrail]
 }
+
+# -----------------------------------------------------------------------------
+# AWS Config
+# -----------------------------------------------------------------------------
+
+resource "aws_iam_role" "config" {
+  count = var.enable_config ? 1 : 0
+  name  = "${var.project}-${var.environment}-config"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = { Service = "config.amazonaws.com" }
+        Action    = "sts:AssumeRole"
+      },
+    ]
+  })
+
+  tags = local.common_tags
+}
+
+resource "aws_iam_role_policy_attachment" "config" {
+  count      = var.enable_config ? 1 : 0
+  role       = aws_iam_role.config[0].name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWS_ConfigRole"
+}
+
+resource "aws_iam_role_policy" "config_s3" {
+  count = var.enable_config ? 1 : 0
+  name  = "config-s3-delivery"
+  role  = aws_iam_role.config[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["s3:PutObject"]
+        Resource = "${aws_s3_bucket.logs.arn}/config/AWSLogs/${local.account_id}/*"
+        Condition = {
+          StringEquals = { "s3:x-amz-acl" = "bucket-owner-full-control" }
+        }
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["s3:GetBucketAcl"]
+        Resource = aws_s3_bucket.logs.arn
+      },
+    ]
+  })
+}
+
+resource "aws_config_configuration_recorder" "this" {
+  count = var.enable_config ? 1 : 0
+  name  = "${var.project}-${var.environment}-recorder"
+
+  role_arn = aws_iam_role.config[0].arn
+
+  recording_group {
+    all_supported                 = true
+    include_global_resource_types = true
+  }
+}
+
+resource "aws_config_delivery_channel" "this" {
+  count = var.enable_config ? 1 : 0
+  name  = "${var.project}-${var.environment}-delivery"
+
+  s3_bucket_name = aws_s3_bucket.logs.id
+  s3_key_prefix  = "config"
+
+  snapshot_delivery_properties {
+    delivery_frequency = "Six_Hours"
+  }
+
+  depends_on = [aws_config_configuration_recorder.this]
+}
+
+resource "aws_config_configuration_recorder_status" "this" {
+  count      = var.enable_config ? 1 : 0
+  name       = aws_config_configuration_recorder.this[0].name
+  is_enabled = true
+
+  depends_on = [aws_config_delivery_channel.this]
+}

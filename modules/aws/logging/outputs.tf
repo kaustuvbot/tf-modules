@@ -25,5 +25,5 @@ output "cloudtrail_arn" {
 
 output "config_recorder_id" {
   description = "ID of the AWS Config recorder (if enabled)"
-  value       = ""
+  value       = var.enable_config ? aws_config_configuration_recorder.this[0].id : null
 }
