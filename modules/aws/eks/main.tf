@@ -51,10 +51,23 @@ resource "aws_eks_cluster" "this" {
   version  = var.cluster_version
   role_arn = aws_iam_role.cluster.arn
 
+  enabled_cluster_log_types = var.enabled_cluster_log_types
+
   vpc_config {
     subnet_ids              = var.subnet_ids
     endpoint_private_access = true
     endpoint_public_access  = true
+  }
+
+  dynamic "encryption_config" {
+    for_each = var.kms_key_arn != null ? [1] : []
+
+    content {
+      provider {
+        key_arn = var.kms_key_arn
+      }
+      resources = ["secrets"]
+    }
   }
 
   tags = merge(local.common_tags, {

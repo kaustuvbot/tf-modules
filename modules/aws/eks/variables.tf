@@ -66,6 +66,12 @@ variable "kms_key_arn" {
   default     = null
 }
 
+variable "enabled_cluster_log_types" {
+  description = "List of EKS control plane log types to enable"
+  type        = list(string)
+  default     = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+}
+
 variable "tags" {
   description = "Additional tags to apply to all EKS resources"
   type        = map(string)
