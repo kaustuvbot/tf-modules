@@ -40,6 +40,24 @@ variable "alb_controller_version" {
   default     = "1.6.2"
 }
 
+variable "enable_external_dns" {
+  description = "Whether to install ExternalDNS"
+  type        = bool
+  default     = false
+}
+
+variable "external_dns_version" {
+  description = "Helm chart version for ExternalDNS"
+  type        = string
+  default     = "1.14.3"
+}
+
+variable "route53_zone_ids" {
+  description = "List of Route53 hosted zone IDs for ExternalDNS to manage"
+  type        = list(string)
+  default     = []
+}
+
 variable "tags" {
   description = "Additional tags to apply to all add-on resources"
   type        = map(string)
