@@ -58,6 +58,18 @@ variable "route53_zone_ids" {
   default     = []
 }
 
+variable "enable_cert_manager" {
+  description = "Whether to install cert-manager"
+  type        = bool
+  default     = false
+}
+
+variable "cert_manager_version" {
+  description = "Helm chart version for cert-manager"
+  type        = string
+  default     = "1.13.3"
+}
+
 variable "tags" {
   description = "Additional tags to apply to all add-on resources"
   type        = map(string)
