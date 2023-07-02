@@ -115,4 +115,9 @@ resource "helm_release" "external_dns" {
     name  = "txtOwnerId"
     value = "${var.project}-${var.environment}"
   }
+
+  timeout          = 300
+  atomic           = true
+  cleanup_on_fail  = true
+  wait             = true
 }

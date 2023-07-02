@@ -89,4 +89,10 @@ resource "helm_release" "alb_controller" {
     name  = "region"
     value = data.aws_region.current.name
   }
+
+  timeout          = 300
+  atomic           = true
+  cleanup_on_fail  = true
+  wait             = true
+  wait_for_jobs    = true
 }
