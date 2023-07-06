@@ -50,6 +50,25 @@ variable "alarm_period" {
   default     = 300
 }
 
+variable "alarm_email_addresses" {
+  description = "List of email addresses to subscribe to alarm notifications"
+  type        = list(string)
+  default     = []
+}
+
+variable "slack_webhook_url" {
+  description = "Slack incoming webhook URL for alarm notifications (optional)"
+  type        = string
+  default     = null
+  sensitive   = true
+}
+
+variable "slack_channel" {
+  description = "Slack channel name for alarm notifications (e.g., #alerts)"
+  type        = string
+  default     = "#alerts"
+}
+
 variable "tags" {
   description = "Additional tags to apply to all monitoring resources"
   type        = map(string)
