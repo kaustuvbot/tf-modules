@@ -45,14 +45,16 @@ resource "aws_cloudwatch_metric_alarm" "eks_cpu" {
   count = var.enable_eks_alarms ? 1 : 0
 
   alarm_name          = "${var.project}-${var.environment}-eks-cpu-high"
-  alarm_description   = "EKS cluster CPU utilization exceeds ${var.alarm_cpu_threshold}%"
+  alarm_description   = "EKS cluster CPU utilization exceeds ${var.alarm_cpu_threshold}% for ${var.alarm_evaluation_periods} consecutive periods"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = var.alarm_evaluation_periods
+  datapoints_to_alarm = var.alarm_evaluation_periods
   metric_name         = "node_cpu_utilization"
   namespace           = "ContainerInsights"
   period              = var.alarm_period
   statistic           = "Average"
   threshold           = var.alarm_cpu_threshold
+  treat_missing_data  = "notBreaching"
 
   dimensions = {
     ClusterName = var.cluster_name
@@ -70,14 +72,16 @@ resource "aws_cloudwatch_metric_alarm" "eks_memory" {
   count = var.enable_eks_alarms ? 1 : 0
 
   alarm_name          = "${var.project}-${var.environment}-eks-memory-high"
-  alarm_description   = "EKS cluster memory utilization exceeds ${var.alarm_memory_threshold}%"
+  alarm_description   = "EKS cluster memory utilization exceeds ${var.alarm_memory_threshold}% for ${var.alarm_evaluation_periods} consecutive periods"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = var.alarm_evaluation_periods
+  datapoints_to_alarm = var.alarm_evaluation_periods
   metric_name         = "node_memory_utilization"
   namespace           = "ContainerInsights"
   period              = var.alarm_period
   statistic           = "Average"
   threshold           = var.alarm_memory_threshold
+  treat_missing_data  = "notBreaching"
 
   dimensions = {
     ClusterName = var.cluster_name
@@ -98,11 +102,13 @@ resource "aws_cloudwatch_metric_alarm" "eks_node_not_ready" {
   alarm_description   = "One or more EKS nodes are in NotReady state"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
+  datapoints_to_alarm = 2
   metric_name         = "node_status_condition_ready"
   namespace           = "ContainerInsights"
   period              = var.alarm_period
   statistic           = "Minimum"
   threshold           = 0
+  treat_missing_data  = "breaching"
 
   dimensions = {
     ClusterName = var.cluster_name
@@ -120,22 +126,50 @@ resource "aws_cloudwatch_metric_alarm" "eks_pod_restart" {
   count = var.enable_eks_alarms ? 1 : 0
 
   alarm_name          = "${var.project}-${var.environment}-eks-pod-restarts"
-  alarm_description   = "High pod restart rate in EKS cluster"
+  alarm_description   = "High pod restart rate (>10 restarts in period) in EKS cluster"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 2
+  evaluation_periods  = 3
+  datapoints_to_alarm = 2
   metric_name         = "pod_number_of_container_restarts"
   namespace           = "ContainerInsights"
   period              = var.alarm_period
   statistic           = "Sum"
-  threshold           = 10
+  threshold           = var.alarm_pod_restart_threshold
+  treat_missing_data  = "notBreaching"
 
   dimensions = {
     ClusterName = var.cluster_name
   }
 
   alarm_actions = [local.sns_topic_arn]
+  ok_actions    = [local.sns_topic_arn]
 
   tags = merge(local.common_tags, {
     Alarm = "eks-pod-restarts"
+  })
+}
+
+# -----------------------------------------------------------------------------
+# Composite Alarm — Node Health
+# -----------------------------------------------------------------------------
+# Fires only when BOTH cpu AND memory are high, or when a node is NotReady.
+# Reduces noise from brief spikes.
+
+resource "aws_cloudwatch_composite_alarm" "eks_node_health" {
+  count = var.enable_eks_alarms ? 1 : 0
+
+  alarm_name        = "${var.project}-${var.environment}-eks-node-health"
+  alarm_description = "EKS node health degraded — check node readiness or sustained resource pressure"
+
+  alarm_rule = join(" OR ", [
+    "ALARM(${aws_cloudwatch_metric_alarm.eks_node_not_ready[0].alarm_name})",
+    "(ALARM(${aws_cloudwatch_metric_alarm.eks_cpu[0].alarm_name}) AND ALARM(${aws_cloudwatch_metric_alarm.eks_memory[0].alarm_name}))",
+  ])
+
+  alarm_actions = [local.sns_topic_arn]
+  ok_actions    = [local.sns_topic_arn]
+
+  tags = merge(local.common_tags, {
+    Alarm = "eks-node-health"
   })
 }

@@ -50,6 +50,12 @@ variable "alarm_period" {
   default     = 300
 }
 
+variable "alarm_pod_restart_threshold" {
+  description = "Number of pod restarts per period before alarm triggers"
+  type        = number
+  default     = 10
+}
+
 variable "alarm_email_addresses" {
   description = "List of email addresses to subscribe to alarm notifications"
   type        = list(string)
