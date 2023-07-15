@@ -99,3 +99,39 @@ resource "aws_budgets_budget" "forecast" {
     subscriber_email_addresses = var.alert_email_addresses
   }
 }
+
+# -----------------------------------------------------------------------------
+# Cost Anomaly Detection
+# -----------------------------------------------------------------------------
+# Detects unexpected spend spikes outside normal patterns using ML.
+# More reliable than threshold-based alerts for catching novel cost events.
+
+resource "aws_ce_anomaly_monitor" "this" {
+  count = var.enable_anomaly_detection ? 1 : 0
+
+  name              = "${local.budget_name_prefix}-anomaly-monitor"
+  monitor_type      = "DIMENSIONAL"
+  monitor_dimension = "SERVICE"
+}
+
+resource "aws_ce_anomaly_subscription" "this" {
+  count = var.enable_anomaly_detection ? 1 : 0
+
+  name      = "${local.budget_name_prefix}-anomaly-subscription"
+  frequency = "DAILY"
+
+  monitor_arn_list = [aws_ce_anomaly_monitor.this[0].arn]
+
+  subscriber {
+    type    = "EMAIL"
+    address = length(var.alert_email_addresses) > 0 ? var.alert_email_addresses[0] : null
+  }
+
+  threshold_expression {
+    dimension {
+      key           = "ANOMALY_TOTAL_IMPACT_ABSOLUTE"
+      values        = [tostring(var.anomaly_threshold_amount)]
+      match_options = ["GREATER_THAN_OR_EQUAL"]
+    }
+  }
+}

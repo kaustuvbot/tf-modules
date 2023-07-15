@@ -10,5 +10,10 @@ output "forecast_budget_name" {
 
 output "anomaly_monitor_arn" {
   description = "ARN of the cost anomaly monitor"
-  value       = ""
+  value       = var.enable_anomaly_detection ? aws_ce_anomaly_monitor.this[0].arn : null
+}
+
+output "anomaly_subscription_arn" {
+  description = "ARN of the cost anomaly subscription"
+  value       = var.enable_anomaly_detection ? aws_ce_anomaly_subscription.this[0].arn : null
 }

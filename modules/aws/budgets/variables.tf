@@ -56,6 +56,18 @@ variable "cost_filters" {
   default     = {}
 }
 
+variable "enable_anomaly_detection" {
+  description = "Whether to create a Cost Anomaly Detection monitor and subscription"
+  type        = bool
+  default     = true
+}
+
+variable "anomaly_threshold_amount" {
+  description = "Minimum anomaly dollar amount to trigger an alert"
+  type        = number
+  default     = 20
+}
+
 variable "tags" {
   description = "Additional tags for budget-related resources"
   type        = map(string)
