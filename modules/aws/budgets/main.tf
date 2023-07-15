@@ -11,13 +11,12 @@
 locals {
   budget_name_prefix = "${var.project}-${var.environment}"
 
-  # Build notification subscriber list from email addresses
-  subscribers = [
-    for email in var.alert_email_addresses : {
-      subscription_type = "EMAIL"
-      address           = email
-    }
-  ]
+  # AWS Budgets API requires limit_amount as a string with exactly 2 decimal places
+  # e.g. "500" is rejected, "500.00" is accepted
+  formatted_amount = format("%.2f", var.monthly_budget_amount)
+
+  # Guard against empty email list for anomaly subscription
+  anomaly_email = length(var.alert_email_addresses) > 0 ? var.alert_email_addresses[0] : null
 }
 
 # -----------------------------------------------------------------------------
@@ -27,7 +26,7 @@ locals {
 resource "aws_budgets_budget" "monthly" {
   name         = "${local.budget_name_prefix}-monthly"
   budget_type  = "COST"
-  limit_amount = tostring(var.monthly_budget_amount)
+  limit_amount = local.formatted_amount
   limit_unit   = var.currency
   time_unit    = "MONTHLY"
 
@@ -77,7 +76,7 @@ resource "aws_budgets_budget" "monthly" {
 resource "aws_budgets_budget" "forecast" {
   name         = "${local.budget_name_prefix}-forecast"
   budget_type  = "COST"
-  limit_amount = tostring(var.monthly_budget_amount)
+  limit_amount = local.formatted_amount
   limit_unit   = var.currency
   time_unit    = "MONTHLY"
 
@@ -115,7 +114,7 @@ resource "aws_ce_anomaly_monitor" "this" {
 }
 
 resource "aws_ce_anomaly_subscription" "this" {
-  count = var.enable_anomaly_detection ? 1 : 0
+  count = var.enable_anomaly_detection && local.anomaly_email != null ? 1 : 0
 
   name      = "${local.budget_name_prefix}-anomaly-subscription"
   frequency = "DAILY"
@@ -124,7 +123,7 @@ resource "aws_ce_anomaly_subscription" "this" {
 
   subscriber {
     type    = "EMAIL"
-    address = length(var.alert_email_addresses) > 0 ? var.alert_email_addresses[0] : null
+    address = local.anomaly_email
   }
 
   threshold_expression {
