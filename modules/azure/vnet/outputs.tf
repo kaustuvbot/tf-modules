@@ -12,3 +12,13 @@ output "address_space" {
   description = "Address space of the VNet"
   value       = azurerm_virtual_network.this.address_space
 }
+
+output "subnet_ids" {
+  description = "Map of subnet name to subnet resource ID"
+  value       = { for k, v in azurerm_subnet.this : k => v.id }
+}
+
+output "nsg_ids" {
+  description = "Map of subnet name to NSG resource ID"
+  value       = { for k, v in azurerm_network_security_group.this : k => v.id }
+}
