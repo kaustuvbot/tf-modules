@@ -33,6 +33,18 @@ variable "system_node_pool_subnet_id" {
   type        = string
 }
 
+variable "private_cluster_enabled" {
+  description = "Deploy the API server as a private endpoint (recommended for prod)"
+  type        = bool
+  default     = false
+}
+
+variable "authorized_ip_ranges" {
+  description = "List of CIDR ranges allowed to reach the public API server endpoint. Ignored when private_cluster_enabled=true."
+  type        = list(string)
+  default     = []
+}
+
 variable "tags" {
   description = "Additional tags to merge with default tags"
   type        = map(string)
