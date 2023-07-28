@@ -6,11 +6,15 @@
 # - Public access fully blocked
 # - Optional force_destroy for dev environments
 
+locals {
+  tags = merge({ ManagedBy = "terraform" }, var.tags)
+}
+
 resource "aws_s3_bucket" "state" {
   bucket        = var.bucket_name
   force_destroy = var.force_destroy
 
-  tags = var.tags
+  tags = local.tags
 
   lifecycle {
     prevent_destroy = true

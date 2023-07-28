@@ -4,6 +4,10 @@
 # for a table that sees very low traffic. Optionally supports TTL
 # to auto-expire stale lock entries.
 
+locals {
+  tags = merge({ ManagedBy = "terraform" }, var.tags)
+}
+
 resource "aws_dynamodb_table" "lock" {
   name         = var.table_name
   billing_mode = "PAY_PER_REQUEST"
@@ -22,5 +26,5 @@ resource "aws_dynamodb_table" "lock" {
     }
   }
 
-  tags = var.tags
+  tags = local.tags
 }
