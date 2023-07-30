@@ -72,6 +72,18 @@ variable "enabled_cluster_log_types" {
   default     = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 }
 
+variable "endpoint_public_access" {
+  description = "Enable public access to the EKS API server endpoint"
+  type        = bool
+  default     = true
+}
+
+variable "public_access_cidrs" {
+  description = "List of CIDR blocks allowed to reach the public API server. Defaults to 0.0.0.0/0 when empty."
+  type        = list(string)
+  default     = []
+}
+
 variable "tags" {
   description = "Additional tags to apply to all EKS resources"
   type        = map(string)
