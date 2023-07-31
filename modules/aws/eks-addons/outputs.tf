@@ -12,3 +12,13 @@ output "cert_manager_role_arn" {
   description = "ARN of the cert-manager IRSA role"
   value       = var.enable_cert_manager ? aws_iam_role.cert_manager[0].arn : null
 }
+
+output "prometheus_namespace" {
+  description = "Namespace where kube-prometheus-stack is installed"
+  value       = var.enable_prometheus ? var.prometheus_namespace : null
+}
+
+output "loki_namespace" {
+  description = "Namespace where Loki is installed"
+  value       = var.enable_loki ? var.loki_namespace : null
+}
