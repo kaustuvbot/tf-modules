@@ -13,6 +13,21 @@ variable "cluster_name" {
   type        = string
 }
 
+variable "cluster_endpoint" {
+  description = "EKS cluster API server endpoint (used by Helm provider)"
+  type        = string
+}
+
+variable "cluster_ca_certificate" {
+  description = "Base64-encoded CA certificate for the EKS cluster"
+  type        = string
+}
+
+variable "region" {
+  description = "AWS region where the cluster is deployed"
+  type        = string
+}
+
 variable "oidc_provider_arn" {
   description = "ARN of the EKS OIDC provider for IRSA"
   type        = string
