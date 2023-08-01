@@ -9,6 +9,8 @@ Manages Kubernetes add-ons for EKS clusters via Helm with IRSA-based authenticat
 | AWS Load Balancer Controller | ALB/NLB ingress management | Enabled |
 | ExternalDNS | Automatic Route53 DNS records | Disabled |
 | cert-manager | TLS certificate automation | Disabled |
+| kube-prometheus-stack | Prometheus + Grafana + Alertmanager | Disabled |
+| loki-stack | Loki log aggregation + Promtail | Disabled |
 
 ## Usage
 
@@ -19,10 +21,13 @@ module "eks_addons" {
   project     = "myproject"
   environment = "prod"
 
-  cluster_name      = module.eks.cluster_name
-  oidc_provider_arn = module.eks.oidc_provider_arn
-  oidc_provider_url = module.eks.oidc_provider_url
-  vpc_id            = module.vpc.vpc_id
+  cluster_name           = module.eks.cluster_name
+  cluster_endpoint       = module.eks.cluster_endpoint
+  cluster_ca_certificate = module.eks.cluster_certificate_authority_data
+  region                 = var.region
+  oidc_provider_arn      = module.eks.oidc_provider_arn
+  oidc_provider_url      = module.eks.oidc_provider_url
+  vpc_id                 = module.vpc.vpc_id
 
   # ALB Controller (enabled by default)
   enable_alb_controller  = true
@@ -50,6 +55,9 @@ module "eks_addons" {
 | `project` | Project name | `string` | — |
 | `environment` | Environment name | `string` | — |
 | `cluster_name` | EKS cluster name | `string` | — |
+| `cluster_endpoint` | API server endpoint | `string` | — |
+| `cluster_ca_certificate` | Base64 CA certificate | `string` | — |
+| `region` | AWS region | `string` | — |
 | `oidc_provider_arn` | OIDC provider ARN | `string` | — |
 | `oidc_provider_url` | OIDC provider URL | `string` | — |
 | `vpc_id` | VPC ID | `string` | — |
@@ -69,6 +77,8 @@ module "eks_addons" {
 | `alb_controller_role_arn` | ALB controller IRSA role ARN |
 | `external_dns_role_arn` | ExternalDNS IRSA role ARN |
 | `cert_manager_role_arn` | cert-manager IRSA role ARN |
+| `prometheus_namespace` | Namespace of the Prometheus stack (null if disabled) |
+| `loki_namespace` | Namespace of Loki (null if disabled) |
 
 ## Version Pinning
 
@@ -86,5 +96,7 @@ The module enforces this installation order:
 1. ALB Controller (no dependencies)
 2. ExternalDNS (no dependencies)
 3. cert-manager (depends on ALB controller)
+4. kube-prometheus-stack (no dependencies)
+5. loki-stack (depends on kube-prometheus-stack)
 
 All releases use `atomic = true` for clean rollback on failure.
