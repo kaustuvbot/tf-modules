@@ -20,6 +20,12 @@ variable "alarm_email_addresses" {
   default     = []
 }
 
+variable "enable_observability" {
+  description = "Enable Prometheus and Loki observability stack"
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Extra tags"
   type        = map(string)
