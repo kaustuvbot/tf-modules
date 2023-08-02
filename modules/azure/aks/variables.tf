@@ -55,6 +55,12 @@ variable "authorized_ip_ranges" {
   default     = []
 }
 
+variable "workload_identity_enabled" {
+  description = "Enable Azure Workload Identity and the OIDC issuer on the cluster"
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Additional tags to merge with default tags"
   type        = map(string)

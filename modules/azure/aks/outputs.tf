@@ -24,3 +24,8 @@ output "kubelet_identity_object_id" {
   description = "Object ID of the kubelet managed identity (used for ACR pull assignments)"
   value       = azurerm_kubernetes_cluster.this.kubelet_identity[0].object_id
 }
+
+output "oidc_issuer_url" {
+  description = "OIDC issuer URL for Workload Identity federation (null when workload_identity_enabled=false)"
+  value       = var.workload_identity_enabled ? azurerm_kubernetes_cluster.this.oidc_issuer_url : null
+}

@@ -62,6 +62,9 @@ resource "azurerm_kubernetes_cluster" "this" {
     type = "SystemAssigned"
   }
 
+  oidc_issuer_enabled       = var.workload_identity_enabled
+  workload_identity_enabled = var.workload_identity_enabled
+
   network_profile {
     network_plugin    = "azure"
     load_balancer_sku = "standard"
