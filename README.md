@@ -9,17 +9,43 @@ Production-grade Terraform modules for multi-cloud infrastructure.
 
 A modular, reusable Terraform platform that provides consistent infrastructure patterns across cloud providers. The goal is to enable rapid, secure, and repeatable deployments for production workloads.
 
-## Supported Clouds
+## Module Inventory
 
-| Cloud | Status | Key Modules |
-|-------|--------|-------------|
-| AWS | In Progress | VPC, IAM/OIDC, EKS, logging, budgets |
-| Azure | Planned | Resource Group, VNet, AKS, Key Vault, monitoring |
-| GCP | Future | VPC, GKE, IAM, logging |
+### AWS
+
+| Module | Description | Docs |
+|--------|-------------|------|
+| `modules/aws/vpc` | VPC with public/private subnets, NAT gateway, IGW | — |
+| `modules/aws/iam` | GitHub OIDC provider, CI plan/apply roles | — |
+| `modules/aws/s3-state` | S3 bucket for Terraform remote state | — |
+| `modules/aws/dynamodb-lock` | DynamoDB table for state locking | — |
+| `modules/aws/kms` | KMS keys for logs, state, and general use | — |
+| `modules/aws/logging` | CloudTrail, AWS Config, S3 log archive | — |
+| `modules/aws/eks` | EKS cluster with managed node groups, IRSA, OIDC | — |
+| `modules/aws/eks-addons` | ALB controller, ExternalDNS, cert-manager, Prometheus, Loki | — |
+| `modules/aws/monitoring` | CloudWatch alarms, SNS, composite alerts | — |
+| `modules/aws/budgets` | Cost budgets and anomaly detection | — |
+
+### Azure
+
+| Module | Description | Docs |
+|--------|-------------|------|
+| `modules/azure/resource-group` | Resource group with standard naming | — |
+| `modules/azure/vnet` | VNet with per-subnet NSGs | [azure-networking.md](docs/azure-networking.md) |
+| `modules/azure/aks` | AKS cluster with autoscaling, workload identity, user pools | [azure-aks.md](docs/azure-aks.md) |
+| `modules/azure/key-vault` | Key Vault with RBAC and purge protection | [azure-security-monitoring.md](docs/azure-security-monitoring.md) |
+| `modules/azure/monitoring` | Azure Monitor metric alerts for AKS | [azure-security-monitoring.md](docs/azure-security-monitoring.md) |
+
+## Examples
+
+| Example | Description |
+|---------|-------------|
+| `examples/aws-complete` | Full AWS stack: VPC → EKS → add-ons → monitoring |
+| `examples/azure-complete` | Full Azure stack: RG → VNet → AKS → KV → alerts |
 
 ## Design Principles
 
-- **Consistency**: Common naming, tagging, and output patterns across all clouds
+- **Consistency**: Common `project`/`environment` variable contract and tag standards across all clouds
 - **Security by default**: Encryption enabled, least-privilege IAM, private networking where possible
 - **Environment parity**: Same module interfaces for dev, staging, and production
 - **Progressive complexity**: Start simple, add features incrementally
@@ -29,21 +55,27 @@ A modular, reusable Terraform platform that provides consistent infrastructure p
 
 ```
 tf-modules/
-├── modules/          # Reusable Terraform modules
-│   ├── core/         # Cloud-agnostic (naming, tagging)
-│   ├── aws/          # AWS-specific modules
-│   └── azure/        # Azure-specific modules
-├── environments/     # Per-environment configurations
-├── bootstrap/        # State backend bootstrapping
-├── examples/         # Usage examples
-├── docs/             # Architecture and design docs
-├── scripts/          # Helper scripts (fmt, validate)
-└── tests/            # Module tests
+├── modules/
+│   ├── aws/              # AWS modules (VPC, IAM, EKS, ...)
+│   └── azure/            # Azure modules (VNet, AKS, ...)
+├── examples/
+│   ├── aws-complete/     # Full AWS composition example
+│   └── azure-complete/   # Full Azure composition example
+├── docs/                 # Architecture and design guides
+├── policy/               # OPA/Conftest tag enforcement policies
+├── tests/
+│   ├── aws/              # Terratest for AWS modules
+│   └── azure/            # Terratest for Azure modules
+└── .github/workflows/    # CI: validate, plan, apply
 ```
 
-## Getting Started
+## CI/CD
 
-> This project is under active development. Module documentation will be added as modules are implemented.
+- **Validate**: `terraform fmt`, `terraform validate`, tfsec, checkov, OPA tag policy
+- **Plan**: Per-environment matrix plan with PR comment output
+- **Apply**: Sequential apply on merge to `main` with GitHub environment gates
+
+See [docs/](docs/) for full architecture and usage guides.
 
 ## License
 
