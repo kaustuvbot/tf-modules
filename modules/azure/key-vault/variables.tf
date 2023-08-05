@@ -5,11 +5,21 @@
 variable "project" {
   description = "Project name used in resource naming"
   type        = string
+
+  validation {
+    condition     = can(regex("^[a-z0-9-]{2,24}$", var.project))
+    error_message = "project must be 2-24 lowercase alphanumeric characters or hyphens."
+  }
 }
 
 variable "environment" {
   description = "Environment name (dev, staging, prod)"
   type        = string
+
+  validation {
+    condition     = contains(["dev", "staging", "prod"], var.environment)
+    error_message = "environment must be one of: dev, staging, prod."
+  }
 }
 
 variable "resource_group_name" {
