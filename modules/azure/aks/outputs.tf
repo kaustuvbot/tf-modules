@@ -29,3 +29,8 @@ output "oidc_issuer_url" {
   description = "OIDC issuer URL for Workload Identity federation (null when workload_identity_enabled=false)"
   value       = var.workload_identity_enabled ? azurerm_kubernetes_cluster.this.oidc_issuer_url : null
 }
+
+output "user_node_pool_ids" {
+  description = "Map of user node pool name to resource ID"
+  value       = { for k, v in azurerm_kubernetes_cluster_node_pool.user : k => v.id }
+}
