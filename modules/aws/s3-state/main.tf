@@ -40,6 +40,14 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "state" {
   }
 }
 
+resource "aws_s3_bucket_logging" "state" {
+  count = var.access_log_bucket != null ? 1 : 0
+
+  bucket        = aws_s3_bucket.state.id
+  target_bucket = var.access_log_bucket
+  target_prefix = var.access_log_prefix
+}
+
 resource "aws_s3_bucket_public_access_block" "state" {
   bucket = aws_s3_bucket.state.id
 
