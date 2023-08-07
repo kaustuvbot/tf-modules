@@ -132,9 +132,13 @@ resource "aws_eks_node_group" "this" {
   subnet_ids      = var.subnet_ids
 
   instance_types = each.value.instance_types
-  disk_size      = each.value.disk_size
   capacity_type  = each.value.capacity_type
   labels         = each.value.labels
+
+  launch_template {
+    id      = aws_launch_template.node[each.key].id
+    version = aws_launch_template.node[each.key].latest_version
+  }
 
   scaling_config {
     desired_size = each.value.desired_size
