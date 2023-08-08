@@ -8,8 +8,9 @@
 variable "subnets" {
   description = "Map of subnet name to configuration"
   type = map(object({
-    address_prefixes  = list(string)
-    service_endpoints = optional(list(string), [])
+    address_prefixes     = list(string)
+    service_endpoints    = optional(list(string), [])
+    deny_inbound_internet = optional(bool, true)
   }))
   default = {}
 }
@@ -44,4 +45,21 @@ resource "azurerm_subnet_network_security_group_association" "this" {
 
   subnet_id                 = azurerm_subnet.this[each.key].id
   network_security_group_id = azurerm_network_security_group.this[each.key].id
+}
+
+# Deny all inbound internet traffic when requested (enabled per subnet)
+resource "azurerm_network_security_rule" "deny_inbound_internet" {
+  for_each = { for k, v in var.subnets : k => v if v.deny_inbound_internet }
+
+  name                        = "DenyInboundInternet"
+  priority                    = 4000
+  direction                   = "Inbound"
+  access                      = "Deny"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "Internet"
+  destination_address_prefix  = "*"
+  resource_group_name         = var.resource_group_name
+  network_security_group_name = azurerm_network_security_group.this[each.key].name
 }
