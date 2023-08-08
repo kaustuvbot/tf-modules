@@ -32,5 +32,12 @@ resource "azurerm_key_vault" "this" {
   # Require RBAC authorisation; access policies managed via role assignments
   enable_rbac_authorization = true
 
+  network_acls {
+    bypass                     = var.network_acls_bypass
+    default_action             = var.network_acls_default_action
+    ip_rules                   = var.network_acls_ip_rules
+    virtual_network_subnet_ids = var.network_acls_subnet_ids
+  }
+
   tags = local.tags
 }

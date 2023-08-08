@@ -60,6 +60,40 @@ variable "purge_protection_enabled" {
   default     = true
 }
 
+variable "network_acls_bypass" {
+  description = "Services to bypass the network ACL (AzureServices, None)"
+  type        = string
+  default     = "AzureServices"
+
+  validation {
+    condition     = contains(["AzureServices", "None"], var.network_acls_bypass)
+    error_message = "network_acls_bypass must be AzureServices or None."
+  }
+}
+
+variable "network_acls_default_action" {
+  description = "Default action for the network ACL when no rule matches (Allow, Deny)"
+  type        = string
+  default     = "Allow"
+
+  validation {
+    condition     = contains(["Allow", "Deny"], var.network_acls_default_action)
+    error_message = "network_acls_default_action must be Allow or Deny."
+  }
+}
+
+variable "network_acls_ip_rules" {
+  description = "List of IP ranges allowed by the Key Vault network ACL"
+  type        = list(string)
+  default     = []
+}
+
+variable "network_acls_subnet_ids" {
+  description = "List of subnet IDs allowed by the Key Vault network ACL"
+  type        = list(string)
+  default     = []
+}
+
 variable "tags" {
   description = "Additional tags to merge with default tags"
   type        = map(string)
