@@ -64,6 +64,7 @@ resource "azurerm_kubernetes_cluster" "this" {
 
   oidc_issuer_enabled       = var.workload_identity_enabled
   workload_identity_enabled = var.workload_identity_enabled
+  azure_policy_enabled      = var.azure_policy_enabled
 
   network_profile {
     network_plugin    = "azure"

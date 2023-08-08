@@ -61,6 +61,12 @@ variable "workload_identity_enabled" {
   default     = false
 }
 
+variable "azure_policy_enabled" {
+  description = "Enable the Azure Policy add-on for Kubernetes (OPA Gatekeeper integration)"
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Additional tags to merge with default tags"
   type        = map(string)
