@@ -16,11 +16,13 @@ output "cluster_endpoint" {
 output "cluster_certificate_authority" {
   description = "Base64 encoded certificate data for the cluster"
   value       = aws_eks_cluster.this.certificate_authority[0].data
+  sensitive   = true
 }
 
 output "cluster_certificate_authority_data" {
   description = "Base64 encoded certificate data for the cluster (alias for cluster_certificate_authority)"
   value       = aws_eks_cluster.this.certificate_authority[0].data
+  sensitive   = true
 }
 
 output "cluster_security_group_id" {
