@@ -155,6 +155,12 @@ resource "aws_eks_node_group" "this" {
     NodeGroup = each.key
   })
 
+  # Ignore desired_size changes after initial creation so the cluster
+  # autoscaler can freely scale node counts without Terraform reverting them.
+  lifecycle {
+    ignore_changes = [scaling_config[0].desired_size]
+  }
+
   depends_on = [
     aws_iam_role_policy_attachment.node_worker,
     aws_iam_role_policy_attachment.node_cni,
