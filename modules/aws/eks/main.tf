@@ -150,6 +150,15 @@ resource "aws_eks_node_group" "this" {
     max_unavailable = 1
   }
 
+  dynamic "taint" {
+    for_each = each.value.taints
+    content {
+      key    = taint.value.key
+      value  = taint.value.value
+      effect = taint.value.effect
+    }
+  }
+
   tags = merge(local.common_tags, {
     Name      = "${local.cluster_name}-${each.key}"
     NodeGroup = each.key
