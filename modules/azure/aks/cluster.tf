@@ -71,5 +71,15 @@ resource "azurerm_kubernetes_cluster" "this" {
     load_balancer_sku = "standard"
   }
 
+  dynamic "maintenance_window" {
+    for_each = var.maintenance_window != null ? [var.maintenance_window] : []
+    content {
+      allowed {
+        day   = maintenance_window.value.day
+        hours = maintenance_window.value.hours
+      }
+    }
+  }
+
   tags = local.tags
 }

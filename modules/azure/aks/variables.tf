@@ -67,6 +67,15 @@ variable "azure_policy_enabled" {
   default     = false
 }
 
+variable "maintenance_window" {
+  description = "Maintenance window configuration for automatic upgrades. Set to null to use the default maintenance window."
+  type = object({
+    day   = string  # Monday, Tuesday, ..., Sunday
+    hours = list(number)  # UTC hours (0-23) during which maintenance is allowed
+  })
+  default = null
+}
+
 variable "tags" {
   description = "Additional tags to merge with default tags"
   type        = map(string)
