@@ -94,3 +94,47 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+# -----------------------------------------------------------------------------
+# Launch Template / IMDS
+# -----------------------------------------------------------------------------
+
+variable "imdsv2_required" {
+  description = "Require IMDSv2 (token-based) on all nodes. Recommended: true."
+  type        = bool
+  default     = true
+}
+
+variable "metadata_http_put_response_hop_limit" {
+  description = "Number of network hops the metadata PUT response can traverse. Set to 1 to block pod access to IMDS."
+  type        = number
+  default     = 1
+}
+
+# -----------------------------------------------------------------------------
+# Managed Add-ons
+# -----------------------------------------------------------------------------
+
+variable "enable_managed_addons" {
+  description = "Enable EKS managed add-ons (vpc-cni, coredns, kube-proxy)"
+  type        = bool
+  default     = true
+}
+
+variable "vpc_cni_version" {
+  description = "Version of the vpc-cni managed add-on. null = latest."
+  type        = string
+  default     = null
+}
+
+variable "coredns_version" {
+  description = "Version of the coredns managed add-on. null = latest."
+  type        = string
+  default     = null
+}
+
+variable "kube_proxy_version" {
+  description = "Version of the kube-proxy managed add-on. null = latest."
+  type        = string
+  default     = null
+}

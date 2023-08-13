@@ -6,30 +6,6 @@
 # AWS-managed updates.
 # -----------------------------------------------------------------------------
 
-variable "enable_managed_addons" {
-  description = "Enable EKS managed add-ons (vpc-cni, coredns, kube-proxy)"
-  type        = bool
-  default     = true
-}
-
-variable "vpc_cni_version" {
-  description = "Version of the vpc-cni managed add-on. null = latest."
-  type        = string
-  default     = null
-}
-
-variable "coredns_version" {
-  description = "Version of the coredns managed add-on. null = latest."
-  type        = string
-  default     = null
-}
-
-variable "kube_proxy_version" {
-  description = "Version of the kube-proxy managed add-on. null = latest."
-  type        = string
-  default     = null
-}
-
 locals {
   managed_addons = var.enable_managed_addons ? {
     vpc-cni    = var.vpc_cni_version
