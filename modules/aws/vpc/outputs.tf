@@ -37,3 +37,13 @@ output "private_route_table_ids" {
   description = "List of private route table IDs"
   value       = aws_route_table.private[*].id
 }
+
+output "flow_log_id" {
+  description = "ID of the VPC flow log resource, or null if flow logs are disabled"
+  value       = length(aws_flow_log.this) > 0 ? aws_flow_log.this[0].id : null
+}
+
+output "flow_log_cloudwatch_log_group_name" {
+  description = "CloudWatch log group name used for flow logs, or null if not applicable"
+  value       = var.enable_flow_logs && var.flow_logs_destination == "cloud-watch-logs" ? var.flow_logs_cloudwatch_log_group_name : null
+}
