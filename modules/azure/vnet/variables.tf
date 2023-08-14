@@ -43,6 +43,12 @@ variable "address_space" {
   }
 }
 
+variable "ddos_protection_plan_id" {
+  description = "Resource ID of an existing Azure DDoS Protection Standard plan to attach to this VNet. null disables DDoS Standard (uses Basic)."
+  type        = string
+  default     = null
+}
+
 variable "tags" {
   description = "Additional tags to merge with default tags"
   type        = map(string)
