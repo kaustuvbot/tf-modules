@@ -48,6 +48,7 @@ variable "node_groups" {
     max_size       = number
     disk_size      = optional(number, 50)
     capacity_type  = optional(string, "ON_DEMAND")
+    ami_type       = optional(string, "AL2_x86_64")
     labels         = optional(map(string), {})
     taints = optional(list(object({
       key    = string
