@@ -147,6 +147,31 @@ resource "aws_cloudwatch_metric_alarm" "eks_pod_restart" {
   })
 }
 
+resource "aws_cloudwatch_metric_alarm" "eks_pending_pods" {
+  count = var.enable_eks_alarms ? 1 : 0
+
+  alarm_name          = "${local.alarm_name_prefix}-eks-pending-pods"
+  alarm_description   = "Elevated number of pods stuck in Pending state — possible scheduling or capacity issue"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 3
+  datapoints_to_alarm = 2
+  metric_name         = "pod_number_of_pending"
+  namespace           = "ContainerInsights"
+  period              = var.alarm_period
+  statistic           = "Maximum"
+  threshold           = var.alarm_pending_pods_threshold
+  treat_missing_data  = "notBreaching"
+
+  dimensions = local.eks_dimensions
+
+  alarm_actions = local.alarm_actions
+  ok_actions    = local.ok_actions
+
+  tags = merge(local.common_tags, {
+    Alarm = "eks-pending-pods"
+  })
+}
+
 # -----------------------------------------------------------------------------
 # Composite Alarm — Node Health
 # -----------------------------------------------------------------------------

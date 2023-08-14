@@ -56,6 +56,12 @@ variable "alarm_pod_restart_threshold" {
   default     = 10
 }
 
+variable "alarm_pending_pods_threshold" {
+  description = "Number of pods in Pending state before alarm triggers"
+  type        = number
+  default     = 5
+}
+
 variable "alarm_email_addresses" {
   description = "List of email addresses to subscribe to alarm notifications"
   type        = list(string)
