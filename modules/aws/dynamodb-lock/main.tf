@@ -9,9 +9,10 @@ locals {
 }
 
 resource "aws_dynamodb_table" "lock" {
-  name         = var.table_name
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "LockID"
+  name                        = var.table_name
+  billing_mode                = "PAY_PER_REQUEST"
+  hash_key                    = "LockID"
+  deletion_protection_enabled = var.enable_delete_protection
 
   attribute {
     name = "LockID"

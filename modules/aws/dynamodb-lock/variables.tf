@@ -15,6 +15,12 @@ variable "ttl_attribute" {
   default     = "ExpiresAt"
 }
 
+variable "enable_delete_protection" {
+  description = "Protect the lock table from accidental deletion. Recommended true in prod."
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Tags to apply to the DynamoDB table"
   type        = map(string)
