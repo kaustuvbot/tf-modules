@@ -8,12 +8,13 @@
 variable "subnets" {
   description = "Map of subnet name to configuration"
   type = map(object({
-    address_prefixes      = list(string)
-    service_endpoints     = optional(list(string), [])
-    deny_inbound_internet = optional(bool, true)
+    address_prefixes       = list(string)
+    service_endpoints      = optional(list(string), [])
+    deny_inbound_internet  = optional(bool, true)
+    deny_outbound_internet = optional(bool, false)
     delegation = optional(object({
-      name    = string  # delegation name, e.g. "aks-delegation"
-      service = string  # service name, e.g. "Microsoft.ContainerService/managedClusters"
+      name    = string # delegation name, e.g. "aks-delegation"
+      service = string # service name, e.g. "Microsoft.ContainerService/managedClusters"
       actions = optional(list(string), ["Microsoft.Network/virtualNetworks/subnets/join/action"])
     }), null)
   }))
@@ -32,8 +33,8 @@ resource "azurerm_subnet" "this" {
   name                 = "snet-${each.key}-${var.environment}"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.this.name
-  address_prefixes  = each.value.address_prefixes
-  service_endpoints = each.value.service_endpoints
+  address_prefixes     = each.value.address_prefixes
+  service_endpoints    = each.value.service_endpoints
 
   dynamic "delegation" {
     for_each = each.value.delegation != null ? [each.value.delegation] : []
@@ -76,6 +77,23 @@ resource "azurerm_network_security_rule" "deny_inbound_internet" {
   destination_port_range      = "*"
   source_address_prefix       = "Internet"
   destination_address_prefix  = "*"
+  resource_group_name         = var.resource_group_name
+  network_security_group_name = azurerm_network_security_group.this[each.key].name
+}
+
+# Deny all outbound internet traffic when requested (opt-in per subnet)
+resource "azurerm_network_security_rule" "deny_outbound_internet" {
+  for_each = { for k, v in var.subnets : k => v if v.deny_outbound_internet }
+
+  name                        = "DenyOutboundInternet"
+  priority                    = 4000
+  direction                   = "Outbound"
+  access                      = "Deny"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "Internet"
   resource_group_name         = var.resource_group_name
   network_security_group_name = azurerm_network_security_group.this[each.key].name
 }
