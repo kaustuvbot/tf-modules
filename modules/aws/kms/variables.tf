@@ -47,6 +47,12 @@ variable "deletion_window_in_days" {
   }
 }
 
+variable "enable_key_rotation" {
+  description = "Enable automatic annual key rotation for all created KMS keys. Recommended true."
+  type        = bool
+  default     = true
+}
+
 variable "tags" {
   description = "Additional tags to apply to all KMS resources"
   type        = map(string)

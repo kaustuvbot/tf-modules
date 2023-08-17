@@ -34,7 +34,7 @@ resource "aws_kms_key" "logs" {
 
   description             = "Encryption key for ${var.project}-${var.environment} logs"
   deletion_window_in_days = var.deletion_window_in_days
-  enable_key_rotation     = true
+  enable_key_rotation     = var.enable_key_rotation
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -95,7 +95,7 @@ resource "aws_kms_key" "state" {
 
   description             = "Encryption key for ${var.project}-${var.environment} Terraform state"
   deletion_window_in_days = var.deletion_window_in_days
-  enable_key_rotation     = true
+  enable_key_rotation     = var.enable_key_rotation
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -132,7 +132,7 @@ resource "aws_kms_key" "general" {
 
   description             = "General-purpose encryption key for ${var.project}-${var.environment}"
   deletion_window_in_days = var.deletion_window_in_days
-  enable_key_rotation     = true
+  enable_key_rotation     = var.enable_key_rotation
 
   policy = jsonencode({
     Version = "2012-10-17"
