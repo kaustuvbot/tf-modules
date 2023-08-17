@@ -7,7 +7,8 @@
 # - Optional force_destroy for dev environments
 
 locals {
-  tags = merge({ ManagedBy = "terraform" }, var.tags)
+  tags          = merge({ ManagedBy = "terraform" }, var.tags)
+  sse_algorithm = var.kms_key_arn != null ? "aws:kms" : "AES256"
 }
 
 resource "aws_s3_bucket" "state" {
@@ -34,7 +35,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "state" {
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm     = var.kms_key_arn != null ? "aws:kms" : "AES256"
+      sse_algorithm     = local.sse_algorithm
       kms_master_key_id = var.kms_key_arn
     }
     bucket_key_enabled = true
