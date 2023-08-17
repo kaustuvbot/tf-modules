@@ -2,7 +2,7 @@
 #
 # Features:
 # - Versioning enabled for state history
-# - Server-side encryption (AES256)
+# - Server-side encryption (AES256 by default, KMS CMK if kms_key_arn is set)
 # - Public access fully blocked
 # - Optional force_destroy for dev environments
 
@@ -34,7 +34,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "state" {
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      sse_algorithm     = var.kms_key_arn != null ? "aws:kms" : "AES256"
+      kms_master_key_id = var.kms_key_arn
     }
     bucket_key_enabled = true
   }

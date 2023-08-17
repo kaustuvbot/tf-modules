@@ -21,6 +21,12 @@ variable "access_log_prefix" {
   default     = "s3-access-logs/"
 }
 
+variable "kms_key_arn" {
+  description = "ARN of a KMS CMK to use for bucket encryption. Defaults to AES256 if not set."
+  type        = string
+  default     = null
+}
+
 variable "tags" {
   description = "Tags to apply to the S3 bucket"
   type        = map(string)
