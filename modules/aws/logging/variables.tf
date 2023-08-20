@@ -47,6 +47,12 @@ variable "kms_key_arn" {
   default     = null
 }
 
+variable "enable_guardduty" {
+  description = "Whether to enable AWS GuardDuty threat detection in this account/region"
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Additional tags to apply to all logging resources"
   type        = map(string)

@@ -14,8 +14,8 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  account_id = data.aws_caller_identity.current.account_id
-  region     = data.aws_region.current.name
+  account_id  = data.aws_caller_identity.current.account_id
+  region      = data.aws_region.current.name
   bucket_name = "${var.project}-${var.environment}-logs-${local.account_id}"
 
   common_tags = merge(
@@ -293,4 +293,17 @@ resource "aws_config_configuration_recorder_status" "this" {
   is_enabled = true
 
   depends_on = [aws_config_delivery_channel.this]
+}
+
+# -----------------------------------------------------------------------------
+# GuardDuty
+# -----------------------------------------------------------------------------
+
+resource "aws_guardduty_detector" "this" {
+  count  = var.enable_guardduty ? 1 : 0
+  enable = true
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project}-${var.environment}-guardduty"
+  })
 }

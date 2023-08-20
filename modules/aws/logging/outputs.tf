@@ -27,3 +27,8 @@ output "config_recorder_id" {
   description = "ID of the AWS Config recorder (if enabled)"
   value       = var.enable_config ? aws_config_configuration_recorder.this[0].id : null
 }
+
+output "guardduty_detector_id" {
+  description = "ID of the GuardDuty detector (if enabled)"
+  value       = var.enable_guardduty ? aws_guardduty_detector.this[0].id : null
+}
