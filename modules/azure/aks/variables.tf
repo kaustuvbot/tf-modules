@@ -47,6 +47,11 @@ variable "private_cluster_enabled" {
   description = "Deploy the API server as a private endpoint (recommended for prod)"
   type        = bool
   default     = false
+
+  validation {
+    condition     = !(var.environment == "prod" && var.private_cluster_enabled == false)
+    error_message = "private_cluster_enabled must be true in prod environments."
+  }
 }
 
 variable "authorized_ip_ranges" {
@@ -70,8 +75,8 @@ variable "azure_policy_enabled" {
 variable "maintenance_window" {
   description = "Maintenance window configuration for automatic upgrades. Set to null to use the default maintenance window."
   type = object({
-    day   = string  # Monday, Tuesday, ..., Sunday
-    hours = list(number)  # UTC hours (0-23) during which maintenance is allowed
+    day   = string       # Monday, Tuesday, ..., Sunday
+    hours = list(number) # UTC hours (0-23) during which maintenance is allowed
   })
   default = null
 }
