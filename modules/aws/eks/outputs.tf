@@ -8,6 +8,11 @@ output "cluster_name" {
   value       = aws_eks_cluster.this.name
 }
 
+output "cluster_arn" {
+  description = "ARN of the EKS cluster"
+  value       = aws_eks_cluster.this.arn
+}
+
 output "cluster_endpoint" {
   description = "The EKS cluster API endpoint"
   value       = aws_eks_cluster.this.endpoint
@@ -42,5 +47,10 @@ output "oidc_provider_arn" {
 
 output "oidc_provider_url" {
   description = "URL of the OIDC provider for IRSA (without https:// prefix)"
+  value       = replace(aws_iam_openid_connect_provider.eks.url, "https://", "")
+}
+
+output "oidc_issuer_url" {
+  description = "OIDC issuer URL for IRSA (alias for oidc_provider_url, matches AWS provider naming)"
   value       = replace(aws_iam_openid_connect_provider.eks.url, "https://", "")
 }
