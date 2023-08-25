@@ -49,6 +49,30 @@ variable "ddos_protection_plan_id" {
   default     = null
 }
 
+variable "enable_flow_logs" {
+  description = "Enable NSG flow logs for all subnets in this VNet"
+  type        = bool
+  default     = false
+}
+
+variable "flow_log_storage_account_id" {
+  description = "Storage account resource ID for NSG flow log storage. Required when enable_flow_logs=true."
+  type        = string
+  default     = null
+}
+
+variable "flow_log_network_watcher_name" {
+  description = "Name of the Network Watcher in the same region. Required when enable_flow_logs=true."
+  type        = string
+  default     = null
+}
+
+variable "flow_log_network_watcher_resource_group" {
+  description = "Resource group of the Network Watcher. Required when enable_flow_logs=true."
+  type        = string
+  default     = null
+}
+
 variable "tags" {
   description = "Additional tags to merge with default tags"
   type        = map(string)
