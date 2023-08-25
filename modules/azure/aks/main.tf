@@ -16,6 +16,10 @@ locals {
   }
 
   tags = merge(local.default_tags, var.tags)
+
+  api_server_authorized_ip_ranges = var.private_cluster_enabled ? null : (
+    length(var.authorized_ip_ranges) > 0 ? var.authorized_ip_ranges : null
+  )
 }
 
 # Placeholder: cluster resource defined in cluster.tf
