@@ -81,6 +81,17 @@ variable "maintenance_window" {
   default = null
 }
 
+variable "network_policy" {
+  description = "Network policy engine for the cluster. 'calico' or 'azure'. Enables pod-level traffic control."
+  type        = string
+  default     = "calico"
+
+  validation {
+    condition     = contains(["calico", "azure", "none"], var.network_policy)
+    error_message = "network_policy must be one of: calico, azure, none."
+  }
+}
+
 variable "tags" {
   description = "Additional tags to merge with default tags"
   type        = map(string)

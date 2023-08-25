@@ -68,6 +68,7 @@ resource "azurerm_kubernetes_cluster" "this" {
 
   network_profile {
     network_plugin    = "azure"
+    network_policy    = var.network_policy != "none" ? var.network_policy : null
     load_balancer_sku = "standard"
   }
 
