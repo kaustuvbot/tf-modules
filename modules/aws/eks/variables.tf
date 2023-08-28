@@ -64,6 +64,14 @@ variable "node_groups" {
       max_size       = 4
     }
   }
+
+  validation {
+    condition = alltrue([
+      for ng in values(var.node_groups) :
+      contains(["ON_DEMAND", "SPOT"], ng.capacity_type)
+    ])
+    error_message = "capacity_type must be ON_DEMAND or SPOT for each node group."
+  }
 }
 
 variable "kms_key_arn" {
