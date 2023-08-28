@@ -32,3 +32,8 @@ output "guardduty_detector_id" {
   description = "ID of the GuardDuty detector (if enabled)"
   value       = var.enable_guardduty ? aws_guardduty_detector.this[0].id : null
 }
+
+output "guardduty_account_id" {
+  description = "AWS account ID the GuardDuty detector belongs to (if enabled). Used to construct finding EventBridge patterns."
+  value       = var.enable_guardduty ? aws_guardduty_detector.this[0].account_id : null
+}
