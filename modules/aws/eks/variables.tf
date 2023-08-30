@@ -75,9 +75,14 @@ variable "node_groups" {
 }
 
 variable "kms_key_arn" {
-  description = "KMS key ARN for EKS secrets encryption (optional)"
+  description = "KMS key ARN for EKS secrets encryption. Required in prod environments."
   type        = string
   default     = null
+
+  validation {
+    condition     = !(var.environment == "prod" && var.kms_key_arn == null)
+    error_message = "kms_key_arn must be set in prod to enable secrets encryption at rest."
+  }
 }
 
 variable "enabled_cluster_log_types" {
