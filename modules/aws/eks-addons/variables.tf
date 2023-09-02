@@ -55,6 +55,12 @@ variable "alb_controller_version" {
   default     = "1.6.2"
 }
 
+variable "alb_default_ssl_policy" {
+  description = "Default SSL policy for ALBs created by the controller. Applies when no per-Ingress annotation overrides it."
+  type        = string
+  default     = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+}
+
 variable "enable_external_dns" {
   description = "Whether to install ExternalDNS"
   type        = bool

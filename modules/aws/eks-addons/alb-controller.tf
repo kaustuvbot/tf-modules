@@ -38,9 +38,9 @@ resource "aws_iam_role" "alb_controller" {
   assume_role_policy = data.aws_iam_policy_document.alb_controller_assume[0].json
 
   tags = merge(var.tags, {
-    Name    = "${var.project}-${var.environment}-alb-controller"
-    AddOn   = "aws-load-balancer-controller"
-    Module  = "eks-addons"
+    Name   = "${var.project}-${var.environment}-alb-controller"
+    AddOn  = "aws-load-balancer-controller"
+    Module = "eks-addons"
   })
 }
 
@@ -90,9 +90,14 @@ resource "helm_release" "alb_controller" {
     value = data.aws_region.current.name
   }
 
-  timeout          = 300
-  atomic           = true
-  cleanup_on_fail  = true
-  wait             = true
-  wait_for_jobs    = true
+  set {
+    name  = "defaultSSLPolicy"
+    value = var.alb_default_ssl_policy
+  }
+
+  timeout         = 300
+  atomic          = true
+  cleanup_on_fail = true
+  wait            = true
+  wait_for_jobs   = true
 }
