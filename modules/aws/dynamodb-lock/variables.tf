@@ -21,6 +21,17 @@ variable "enable_delete_protection" {
   default     = false
 }
 
+variable "table_class" {
+  description = "DynamoDB table class. STANDARD or STANDARD_INFREQUENT_ACCESS (lower cost for infrequently accessed data)."
+  type        = string
+  default     = "STANDARD"
+
+  validation {
+    condition     = contains(["STANDARD", "STANDARD_INFREQUENT_ACCESS"], var.table_class)
+    error_message = "table_class must be STANDARD or STANDARD_INFREQUENT_ACCESS."
+  }
+}
+
 variable "tags" {
   description = "Tags to apply to the DynamoDB table"
   type        = map(string)

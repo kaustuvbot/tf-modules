@@ -11,6 +11,7 @@ locals {
 resource "aws_dynamodb_table" "lock" {
   name                        = var.table_name
   billing_mode                = "PAY_PER_REQUEST"
+  table_class                 = var.table_class
   hash_key                    = "LockID"
   deletion_protection_enabled = var.enable_delete_protection
 
