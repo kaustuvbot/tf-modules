@@ -27,6 +27,18 @@ variable "grafana_admin_password" {
   sensitive   = true
 }
 
+variable "prometheus_retention" {
+  description = "Prometheus metrics retention period (e.g. 15d, 30d)"
+  type        = string
+  default     = "15d"
+}
+
+variable "prometheus_storage_size" {
+  description = "PVC storage size for Prometheus data (e.g. 20Gi, 50Gi)"
+  type        = string
+  default     = "20Gi"
+}
+
 resource "helm_release" "prometheus" {
   count = var.enable_prometheus ? 1 : 0
 
@@ -46,11 +58,11 @@ resource "helm_release" "prometheus" {
 
   set {
     name  = "prometheus.prometheusSpec.retention"
-    value = "15d"
+    value = var.prometheus_retention
   }
 
   set {
     name  = "prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage"
-    value = "20Gi"
+    value = var.prometheus_storage_size
   }
 }
