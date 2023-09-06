@@ -17,3 +17,15 @@ output "environment" {
   description = "Environment name passed through for convenience"
   value       = var.environment
 }
+
+output "tags" {
+  description = "Standard tag map derived from naming inputs, merged with extra_tags"
+  value = merge(
+    {
+      Project     = var.project
+      Environment = var.environment
+      ManagedBy   = "terraform"
+    },
+    var.extra_tags,
+  )
+}

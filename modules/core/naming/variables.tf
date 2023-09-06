@@ -19,3 +19,9 @@ variable "suffix" {
   type        = string
   default     = ""
 }
+
+variable "extra_tags" {
+  description = "Additional tags to merge into the tags output"
+  type        = map(string)
+  default     = {}
+}
