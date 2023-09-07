@@ -9,14 +9,70 @@ This project uses semantic versioning starting from v0.9.0.
 
 ## [Unreleased]
 
+---
+
+## [1.0.0] — Phase 5–6: Module Completeness + v1.0.0
+
 ### Added
-- `kubernetes_version` variable in EKS module (supersedes deprecated `cluster_version`)
-- `managed_addon_versions` map variable in EKS module (supersedes deprecated individual addon version variables)
-- `enable_cluster_autoscaler_irsa` variable in EKS module for Karpenter/CA IRSA role
+
+#### AWS EKS
+- `disk_size` field now wired into launch template `block_device_mappings` (gp3, encrypted)
+- `custom_ami_id` field in node_groups for Bottlerocket and hardened AL2 custom AMIs
+- `kubernetes_version` variable (supersedes deprecated `cluster_version`); format validated (`MAJOR.MINOR`)
+- `managed_addon_versions` map variable (supersedes deprecated `vpc_cni_version`, `coredns_version`, `kube_proxy_version`)
+- `enable_cluster_autoscaler_irsa` variable with OIDC IRSA role and policy; `cluster_autoscaler_role_arn` output
+- `check` block warning when both `kubernetes_version` and deprecated `cluster_version` are set simultaneously
+- SPOT node_groups validation: at least 2 `instance_types` required (capacity pool diversification)
+- IAM roles extracted into `iam.tf` for improved module navigability
+
+#### AWS eks-addons
+- `enable_node_termination_handler` — AWS NTH in IMDS mode for SPOT graceful draining
+- `enable_sealed_secrets` — Bitnami Sealed Secrets controller for GitOps secret management
+- `enable_karpenter` — Karpenter with IRSA role, SQS interruption queue, and EventBridge rules
+- `enable_efs_csi_driver` — EFS CSI Driver as EKS managed add-on for ReadWriteMany volumes
+- Input validations: `oidc_provider_url` requires `https://` prefix; `route53_zone_ids` validates AWS zone ID format
+- Outputs: `karpenter_role_arn`, `karpenter_sqs_queue_url`, `efs_csi_addon_id`
+- `examples/aws-eks-with-addons/` end-to-end example demonstrating OIDC output wiring
+
+#### Azure AKS
+- `system_node_pool_os_disk_size_gb` and `system_node_pool_os_disk_type` (Managed/Ephemeral) for system node pool
+- Outputs: `node_resource_group`, `fqdn`, `private_fqdn` (mutually exclusive based on cluster visibility)
+
+#### New Modules
+- `modules/aws/ecr` — ECR repositories with scan-on-push, lifecycle policies, and optional KMS encryption
+- `modules/azure/container-registry` — ACR with SKU selection, geo-replication, zone redundancy
+- `modules/azure/private-dns` — Private DNS zones and VNet links for AKS private cluster resolution
 
 ### Changed
-- `cluster_version` marked as deprecated; use `kubernetes_version`
-- `vpc_cni_version`, `coredns_version`, `kube_proxy_version` marked as deprecated; use `managed_addon_versions`
+- `cluster_version` deprecated; use `kubernetes_version`
+- `vpc_cni_version`, `coredns_version`, `kube_proxy_version` deprecated; use `managed_addon_versions`
+- All Azure provider version constraints normalized to `~> 3.0`
+- Helm provider normalized to `~> 2.0`, Kubernetes provider to `~> 2.0`
+
+### Tests Added
+- `tests/aws/ecr_test.go` — ECR repository URL and ARN validation
+- `tests/azure/container_registry_test.go` — ACR login_server validation
+- `tests/azure/private_dns_test.go` — Private DNS zone name and VNet link validation
+- Extended `tests/aws/eks_test.go` — validates `cluster_autoscaler_role_arn` and `disk_size`
+
+### Documentation
+- `docs/eks-node-groups.md` — Instance selection, SPOT, disk sizing, taints, Karpenter interaction
+- `docs/karpenter-migration.md` — Cluster Autoscaler to Karpenter migration guide
+- `modules/aws/ecr/README.md` — ECR lifecycle, IMMUTABLE tags, cross-account pull
+- `modules/azure/container-registry/README.md` — SKU comparison, RBAC, geo-replication, private endpoint
+- `modules/azure/private-dns/README.md` — AKS private cluster DNS zones, hub-and-spoke pattern
+- CI: `terraform-validate.yml` matrix expanded to 18 modules
+
+---
+
+## [0.9.0] — Phase 4 Security Hardening Complete
+
+### Security
+
+#### AWS EKS
+- IMDSv2 enforced by default (`imdsv2_required = true`, `metadata_http_put_response_hop_limit = 1`)
+- Pod Security Admission namespace mapping via `pod_security_standards` variable; `psa_namespace_labels` output
+- Cluster API authentication mode configurable via `authentication_mode` variable (`access_config` block)
 
 ---
 
