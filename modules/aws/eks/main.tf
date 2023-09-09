@@ -145,10 +145,7 @@ resource "aws_eks_node_group" "this" {
 # -----------------------------------------------------------------------------
 # OIDC Provider for IRSA (IAM Roles for Service Accounts)
 # -----------------------------------------------------------------------------
-
-data "tls_certificate" "eks" {
-  url = aws_eks_cluster.this.identity[0].oidc[0].issuer
-}
+# data.tls_certificate.eks is defined in data.tf.
 
 resource "aws_iam_openid_connect_provider" "eks" {
   url             = aws_eks_cluster.this.identity[0].oidc[0].issuer
