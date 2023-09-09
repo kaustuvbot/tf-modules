@@ -54,3 +54,11 @@ output "oidc_issuer_url" {
   description = "OIDC issuer URL for IRSA (alias for oidc_provider_url, matches AWS provider naming)"
   value       = replace(aws_iam_openid_connect_provider.eks.url, "https://", "")
 }
+
+output "psa_namespace_labels" {
+  description = "Map of namespace to Pod Security Admission enforce label. Apply these as Kubernetes namespace labels after cluster creation."
+  value = {
+    for ns, level in var.pod_security_standards :
+    ns => "pod-security.kubernetes.io/enforce=${level}"
+  }
+}

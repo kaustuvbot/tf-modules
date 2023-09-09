@@ -110,6 +110,42 @@ variable "tags" {
 }
 
 # -----------------------------------------------------------------------------
+# Pod Security Admission
+# -----------------------------------------------------------------------------
+
+variable "pod_security_standards" {
+  description = <<-EOT
+    Map of Kubernetes namespace names to their Pod Security Admission enforce level.
+    Valid levels: privileged, baseline, restricted.
+    These labels must be applied to namespaces after cluster creation via a
+    Kubernetes provider. This variable stores the desired state for reference
+    and is surfaced via the psa_namespace_labels output.
+    Example: { "kube-system" = "privileged", "app" = "restricted" }
+  EOT
+  type        = map(string)
+  default     = {}
+
+  validation {
+    condition = alltrue([
+      for level in values(var.pod_security_standards) :
+      contains(["privileged", "baseline", "restricted"], level)
+    ])
+    error_message = "Pod security levels must be one of: privileged, baseline, restricted."
+  }
+}
+
+variable "authentication_mode" {
+  description = "EKS cluster authentication mode. API_AND_CONFIG_MAP supports both aws-auth ConfigMap and EKS access entries."
+  type        = string
+  default     = "API_AND_CONFIG_MAP"
+
+  validation {
+    condition     = contains(["CONFIG_MAP", "API", "API_AND_CONFIG_MAP"], var.authentication_mode)
+    error_message = "authentication_mode must be one of: CONFIG_MAP, API, API_AND_CONFIG_MAP."
+  }
+}
+
+# -----------------------------------------------------------------------------
 # Launch Template / IMDS
 # -----------------------------------------------------------------------------
 
