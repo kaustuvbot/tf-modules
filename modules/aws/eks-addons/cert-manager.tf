@@ -112,11 +112,11 @@ resource "helm_release" "cert_manager" {
     value = "1001"
   }
 
-  timeout          = 600
-  atomic           = true
-  cleanup_on_fail  = true
-  wait             = true
-  wait_for_jobs    = true
+  timeout         = 600
+  atomic          = true
+  cleanup_on_fail = true
+  wait            = true
+  wait_for_jobs   = true
 
   # CRDs must be installed before ExternalDNS or ALB controller
   # can reference cert-manager annotations

@@ -8,13 +8,13 @@
 variable "user_node_pools" {
   description = "Map of user node pool name to configuration"
   type = map(object({
-    vm_size        = string
-    subnet_id      = string
-    node_count     = optional(number, 2)
-    min_count      = optional(number, 1)
-    max_count      = optional(number, 5)
-    node_labels    = optional(map(string), {})
-    node_taints    = optional(list(string), [])
+    vm_size     = string
+    subnet_id   = string
+    node_count  = optional(number, 2)
+    min_count   = optional(number, 1)
+    max_count   = optional(number, 5)
+    node_labels = optional(map(string), {})
+    node_taints = optional(list(string), [])
   }))
   default = {}
 }

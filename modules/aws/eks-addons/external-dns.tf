@@ -116,8 +116,8 @@ resource "helm_release" "external_dns" {
     value = "${var.project}-${var.environment}"
   }
 
-  timeout          = 300
-  atomic           = true
-  cleanup_on_fail  = true
-  wait             = true
+  timeout         = 300
+  atomic          = true
+  cleanup_on_fail = true
+  wait            = true
 }
