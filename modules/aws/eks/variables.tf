@@ -139,6 +139,18 @@ variable "enable_cluster_autoscaler_irsa" {
   default     = false
 }
 
+variable "enable_velero_irsa" {
+  description = "Create an IRSA IAM role for Velero backup/restore. When true, an OIDC-scoped role with S3 and EC2 snapshot permissions is created for the velero/velero service account."
+  type        = bool
+  default     = false
+}
+
+variable "velero_backup_bucket_arns" {
+  description = "List of S3 bucket ARNs that Velero is allowed to read/write for backups. Required when enable_velero_irsa=true."
+  type        = list(string)
+  default     = []
+}
+
 variable "enabled_cluster_log_types" {
   description = "List of EKS control plane log types to enable"
   type        = list(string)

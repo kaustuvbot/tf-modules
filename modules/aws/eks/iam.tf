@@ -162,3 +162,81 @@ resource "aws_iam_role_policy" "cluster_autoscaler" {
     ]
   })
 }
+
+# -----------------------------------------------------------------------------
+# Velero IRSA Role (optional)
+# -----------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "velero_assume" {
+  count = var.enable_velero_irsa ? 1 : 0
+
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.eks.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub"
+      values   = ["system:serviceaccount:velero:velero"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "velero" {
+  count = var.enable_velero_irsa ? 1 : 0
+
+  name               = "${local.cluster_name}-velero"
+  assume_role_policy = data.aws_iam_policy_document.velero_assume[0].json
+
+  tags = merge(local.common_tags, {
+    Name   = "${local.cluster_name}-velero"
+    AddOn  = "velero"
+    k8s-sa = "velero/velero"
+  })
+}
+
+resource "aws_iam_role_policy" "velero" {
+  count = var.enable_velero_irsa ? 1 : 0
+
+  name = "velero"
+  role = aws_iam_role.velero[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:DescribeVolumes",
+          "ec2:DescribeSnapshots",
+          "ec2:CreateTags",
+          "ec2:CreateVolume",
+          "ec2:CreateSnapshot",
+          "ec2:DeleteSnapshot",
+        ]
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["s3:GetObject", "s3:DeleteObject", "s3:PutObject", "s3:AbortMultipartUpload", "s3:ListMultipartUploadParts"]
+        Resource = length(var.velero_backup_bucket_arns) > 0 ? [for arn in var.velero_backup_bucket_arns : "${arn}/*"] : ["*"]
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["s3:ListBucket"]
+        Resource = length(var.velero_backup_bucket_arns) > 0 ? var.velero_backup_bucket_arns : ["*"]
+      },
+    ]
+  })
+}

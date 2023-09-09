@@ -60,6 +60,11 @@ output "cluster_autoscaler_role_arn" {
   value       = var.enable_cluster_autoscaler_irsa ? aws_iam_role.cluster_autoscaler[0].arn : ""
 }
 
+output "velero_role_arn" {
+  description = "ARN of the IRSA role for Velero. Empty string when enable_velero_irsa=false."
+  value       = var.enable_velero_irsa ? aws_iam_role.velero[0].arn : ""
+}
+
 output "psa_namespace_labels" {
   description = "Map of namespace to Pod Security Admission enforce label. Apply these as Kubernetes namespace labels after cluster creation."
   value = {
