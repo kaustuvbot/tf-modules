@@ -92,6 +92,23 @@ variable "network_policy" {
   }
 }
 
+variable "enable_defender" {
+  description = "Enable Microsoft Defender for Containers on the AKS cluster"
+  type        = bool
+  default     = false
+}
+
+variable "log_analytics_workspace_id" {
+  description = "Log Analytics Workspace resource ID. Required when enable_defender is true."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = !(var.enable_defender == true && var.log_analytics_workspace_id == null)
+    error_message = "log_analytics_workspace_id must be set when enable_defender is true."
+  }
+}
+
 variable "tags" {
   description = "Additional tags to merge with default tags"
   type        = map(string)

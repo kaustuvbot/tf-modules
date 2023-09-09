@@ -66,6 +66,13 @@ resource "azurerm_kubernetes_cluster" "this" {
     load_balancer_sku = "standard"
   }
 
+  dynamic "microsoft_defender" {
+    for_each = var.enable_defender ? [1] : []
+    content {
+      log_analytics_workspace_id = var.log_analytics_workspace_id
+    }
+  }
+
   dynamic "maintenance_window" {
     for_each = var.maintenance_window != null ? [var.maintenance_window] : []
     content {
