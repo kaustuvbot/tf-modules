@@ -112,10 +112,10 @@ resource "helm_release" "cert_manager" {
     value = "1001"
   }
 
-  timeout         = 600
-  atomic          = true
-  cleanup_on_fail = true
-  wait            = true
+  timeout         = 600 # CRD installation takes longer; override the 300s default
+  atomic          = local.helm_release_defaults.atomic
+  cleanup_on_fail = local.helm_release_defaults.cleanup_on_fail
+  wait            = local.helm_release_defaults.wait
   wait_for_jobs   = true
 
   # CRDs must be installed before ExternalDNS or ALB controller

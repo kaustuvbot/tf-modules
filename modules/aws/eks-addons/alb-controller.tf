@@ -95,9 +95,9 @@ resource "helm_release" "alb_controller" {
     value = var.alb_default_ssl_policy
   }
 
-  timeout         = 300
-  atomic          = true
-  cleanup_on_fail = true
-  wait            = true
+  timeout         = local.helm_release_defaults.timeout
+  atomic          = local.helm_release_defaults.atomic
+  cleanup_on_fail = local.helm_release_defaults.cleanup_on_fail
+  wait            = local.helm_release_defaults.wait
   wait_for_jobs   = true
 }

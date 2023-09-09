@@ -116,8 +116,8 @@ resource "helm_release" "external_dns" {
     value = "${var.project}-${var.environment}"
   }
 
-  timeout         = 300
-  atomic          = true
-  cleanup_on_fail = true
-  wait            = true
+  timeout         = local.helm_release_defaults.timeout
+  atomic          = local.helm_release_defaults.atomic
+  cleanup_on_fail = local.helm_release_defaults.cleanup_on_fail
+  wait            = local.helm_release_defaults.wait
 }
