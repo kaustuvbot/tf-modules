@@ -79,7 +79,12 @@ Modules now include explicit security controls. Key additions:
 | AWS DynamoDB lock | Deletion protection via `enable_delete_protection` |
 | AWS KMS | Configurable key rotation via `enable_key_rotation` |
 | AWS Logging | GuardDuty detector via `enable_guardduty` |
+| AWS EKS nodes | IMDSv2 enforced by default via `imdsv2_required=true` |
+| AWS EKS cluster | API authentication mode configurable via `authentication_mode` |
+| AWS EKS namespace | Pod Security Admission level map via `pod_security_standards`; labels surfaced as `psa_namespace_labels` output |
+| AWS EKS ALB | WAFv2 + Shield Advanced via `enable_waf_v2` on eks-addons module |
 | Azure AKS | Private cluster enforced in prod; Calico network policy default |
+| Azure AKS | Microsoft Defender for Containers via `enable_defender` |
 | Azure VNet | Deny-all egress NSG rule per subnet; optional NSG flow logs |
 
 See [docs/aws-security-hardening.md](docs/aws-security-hardening.md) and [docs/azure-security-hardening.md](docs/azure-security-hardening.md) for full guidance.
