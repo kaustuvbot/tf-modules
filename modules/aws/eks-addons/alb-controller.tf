@@ -95,6 +95,16 @@ resource "helm_release" "alb_controller" {
     value = var.alb_default_ssl_policy
   }
 
+  set {
+    name  = "enableWaf"
+    value = tostring(var.enable_waf_v2)
+  }
+
+  set {
+    name  = "enableShield"
+    value = tostring(var.enable_waf_v2)
+  }
+
   timeout         = local.helm_release_defaults.timeout
   atomic          = local.helm_release_defaults.atomic
   cleanup_on_fail = local.helm_release_defaults.cleanup_on_fail

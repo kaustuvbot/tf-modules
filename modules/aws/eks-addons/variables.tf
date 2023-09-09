@@ -61,6 +61,12 @@ variable "alb_default_ssl_policy" {
   default     = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 }
 
+variable "enable_waf_v2" {
+  description = "Enable AWS WAFv2 and Shield Advanced integration on the AWS Load Balancer Controller. When true, sets enableWaf=true and enableShield=true Helm values."
+  type        = bool
+  default     = false
+}
+
 variable "enable_external_dns" {
   description = "Whether to install ExternalDNS"
   type        = bool
