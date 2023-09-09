@@ -137,3 +137,20 @@ resource "aws_route_table_association" "private" {
   subnet_id      = aws_subnet.private[count.index].id
   route_table_id = aws_route_table.private[var.single_nat_gateway ? 0 : count.index].id
 }
+
+# -----------------------------------------------------------------------------
+# VPC Gateway Endpoints
+# -----------------------------------------------------------------------------
+
+resource "aws_vpc_endpoint" "s3" {
+  count = var.enable_s3_vpc_endpoint ? 1 : 0
+
+  vpc_id            = aws_vpc.this.id
+  service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = aws_route_table.private[*].id
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project}-${var.environment}-s3-endpoint"
+  })
+}

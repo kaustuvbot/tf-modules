@@ -68,6 +68,12 @@ variable "single_nat_gateway" {
   default     = true
 }
 
+variable "enable_s3_vpc_endpoint" {
+  description = "Create a VPC Gateway Endpoint for S3. Reduces data transfer costs and avoids internet routing for S3 traffic from private subnets."
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Additional tags to apply to all VPC resources"
   type        = map(string)
