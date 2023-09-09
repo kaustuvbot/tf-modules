@@ -93,4 +93,12 @@ func TestAksSmokeTest(t *testing.T) {
 
 	oidcURL := terraform.Output(t, aksOpts, "oidc_issuer_url")
 	assert.Empty(t, oidcURL, "oidc_issuer_url should be empty when workload_identity_enabled=false")
+
+	// Validate kubelet identity is always provisioned (required for ACR pull assignments)
+	kubeletObjectID := terraform.Output(t, aksOpts, "kubelet_identity_object_id")
+	assert.NotEmpty(t, kubeletObjectID, "kubelet_identity_object_id must be set for ACR pull role assignments")
+
+	// Validate user_node_pool_ids is an empty map when no user pools are configured
+	nodePoolIDs := terraform.OutputMap(t, aksOpts, "user_node_pool_ids")
+	assert.Empty(t, nodePoolIDs, "user_node_pool_ids should be an empty map when user_node_pools is not configured")
 }
