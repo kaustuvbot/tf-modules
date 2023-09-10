@@ -85,3 +85,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "enable_ssm_vpc_endpoints" {
+  description = "Create VPC Interface Endpoints for AWS Systems Manager (ssm, ssmmessages, ec2messages). Required to manage private EC2 instances via Session Manager without internet access."
+  type        = bool
+  default     = false
+}

@@ -47,3 +47,12 @@ output "flow_log_cloudwatch_log_group_name" {
   description = "CloudWatch log group name used for flow logs, or null if not applicable"
   value       = var.enable_flow_logs && var.flow_logs_destination == "cloud-watch-logs" ? var.flow_logs_cloudwatch_log_group_name : null
 }
+
+output "ssm_vpc_endpoint_ids" {
+  description = "Map of SSM VPC endpoint IDs (ssm, ssmmessages, ec2messages). Empty map when enable_ssm_vpc_endpoints=false."
+  value = var.enable_ssm_vpc_endpoints ? {
+    ssm         = aws_vpc_endpoint.ssm[0].id
+    ssmmessages = aws_vpc_endpoint.ssmmessages[0].id
+    ec2messages = aws_vpc_endpoint.ec2messages[0].id
+  } : {}
+}

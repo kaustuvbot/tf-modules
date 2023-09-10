@@ -186,3 +186,49 @@ resource "aws_vpc_endpoint" "s3" {
     Name = "${var.project}-${var.environment}-s3-endpoint"
   })
 }
+
+# -----------------------------------------------------------------------------
+# VPC Interface Endpoints (SSM)
+# -----------------------------------------------------------------------------
+
+resource "aws_vpc_endpoint" "ssm" {
+  count = var.enable_ssm_vpc_endpoints ? 1 : 0
+
+  vpc_id              = aws_vpc.this.id
+  service_name        = "com.amazonaws.${data.aws_region.current.name}.ssm"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = aws_subnet.private[*].id
+  private_dns_enabled = true
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project}-${var.environment}-ssm-endpoint"
+  })
+}
+
+resource "aws_vpc_endpoint" "ssmmessages" {
+  count = var.enable_ssm_vpc_endpoints ? 1 : 0
+
+  vpc_id              = aws_vpc.this.id
+  service_name        = "com.amazonaws.${data.aws_region.current.name}.ssmmessages"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = aws_subnet.private[*].id
+  private_dns_enabled = true
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project}-${var.environment}-ssmmessages-endpoint"
+  })
+}
+
+resource "aws_vpc_endpoint" "ec2messages" {
+  count = var.enable_ssm_vpc_endpoints ? 1 : 0
+
+  vpc_id              = aws_vpc.this.id
+  service_name        = "com.amazonaws.${data.aws_region.current.name}.ec2messages"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = aws_subnet.private[*].id
+  private_dns_enabled = true
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project}-${var.environment}-ec2messages-endpoint"
+  })
+}
