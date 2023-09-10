@@ -56,3 +56,13 @@ output "ssm_vpc_endpoint_ids" {
     ec2messages = aws_vpc_endpoint.ec2messages[0].id
   } : {}
 }
+
+output "aws_region" {
+  description = "AWS region in which the VPC was created. Useful for constructing ARNs and passing to downstream modules."
+  value       = data.aws_region.current.name
+}
+
+output "availability_zones" {
+  description = "List of availability zones used for subnet placement. Mirrors the var.availability_zones input after validation."
+  value       = var.availability_zones
+}
