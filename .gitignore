@@ -30,4 +30,4 @@ CLAUDE*
 
 # Test artifacts
 .test/
-remove_coauthor.sh
+test_script/*
