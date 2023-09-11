@@ -10,6 +10,22 @@
 # -----------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------
+# CloudWatch Log Group
+# -----------------------------------------------------------------------------
+# Create the log group explicitly so we can control retention. Without this,
+# EKS creates it automatically with no expiry (retention = never).
+# -----------------------------------------------------------------------------
+
+resource "aws_cloudwatch_log_group" "eks_cluster" {
+  name              = "/aws/eks/${local.cluster_name}/cluster"
+  retention_in_days = var.cluster_log_retention_days
+
+  tags = merge(local.common_tags, {
+    Name = "/aws/eks/${local.cluster_name}/cluster"
+  })
+}
+
+# -----------------------------------------------------------------------------
 # Cluster IAM Role
 # -----------------------------------------------------------------------------
 
@@ -83,6 +99,7 @@ resource "aws_eks_cluster" "this" {
   depends_on = [
     aws_iam_role_policy_attachment.cluster_policy,
     aws_iam_role_policy_attachment.cluster_vpc_controller,
+    aws_cloudwatch_log_group.eks_cluster,
   ]
 }
 
