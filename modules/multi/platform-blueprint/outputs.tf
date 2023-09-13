@@ -1,3 +1,8 @@
+# Platform Blueprint — Outputs
+#
+# All outputs use cloud-agnostic keys so application teams can consume
+# blueprint outputs without knowing the underlying cloud.
+
 output "cloud" {
   description = "Target cloud for this blueprint deployment"
   value       = var.cloud
@@ -13,13 +18,17 @@ output "environment" {
   value       = var.environment
 }
 
-# Populated by aws.tf or azure.tf sub-compositions
 output "cluster_endpoint" {
-  description = "Kubernetes API server endpoint"
-  value       = local.is_aws ? (length(module.aws_stack) > 0 ? module.aws_stack[0].cluster_endpoint : null) : (length(module.azure_stack) > 0 ? module.azure_stack[0].cluster_endpoint : null)
+  description = "Kubernetes API server endpoint. Use to configure kubectl or helm providers in child modules."
+  value       = local.is_aws ? try(module.aws_stack[0].cluster_endpoint, null) : try(module.azure_stack[0].cluster_endpoint, null)
 }
 
 output "network_id" {
-  description = "VPC ID (AWS) or VNet ID (Azure)"
-  value       = local.is_aws ? (length(module.aws_stack) > 0 ? module.aws_stack[0].network_id : null) : (length(module.azure_stack) > 0 ? module.azure_stack[0].network_id : null)
+  description = "Primary network ID — VPC ID on AWS, VNet resource ID on Azure."
+  value       = local.is_aws ? try(module.aws_stack[0].network_id, null) : try(module.azure_stack[0].network_id, null)
+}
+
+output "common_tags" {
+  description = "Merged tag map applied to all resources in this blueprint deployment."
+  value       = local.common_tags
 }
