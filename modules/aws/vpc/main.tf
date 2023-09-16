@@ -142,6 +142,38 @@ resource "aws_route_table_association" "private" {
 # VPC Gateway Endpoints
 # -----------------------------------------------------------------------------
 
+# -----------------------------------------------------------------------------
+# VPC Interface Endpoints (ECR)
+# -----------------------------------------------------------------------------
+
+resource "aws_vpc_endpoint" "ecr_api" {
+  count = var.enable_ecr_vpc_endpoints ? 1 : 0
+
+  vpc_id              = aws_vpc.this.id
+  service_name        = "com.amazonaws.${data.aws_region.current.name}.ecr.api"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = aws_subnet.private[*].id
+  private_dns_enabled = true
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project}-${var.environment}-ecr-api-endpoint"
+  })
+}
+
+resource "aws_vpc_endpoint" "ecr_dkr" {
+  count = var.enable_ecr_vpc_endpoints ? 1 : 0
+
+  vpc_id              = aws_vpc.this.id
+  service_name        = "com.amazonaws.${data.aws_region.current.name}.ecr.dkr"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = aws_subnet.private[*].id
+  private_dns_enabled = true
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project}-${var.environment}-ecr-dkr-endpoint"
+  })
+}
+
 resource "aws_vpc_endpoint" "s3" {
   count = var.enable_s3_vpc_endpoint ? 1 : 0
 

@@ -68,6 +68,12 @@ variable "single_nat_gateway" {
   default     = true
 }
 
+variable "enable_ecr_vpc_endpoints" {
+  description = "Create VPC Interface Endpoints for ECR API and ECR DKR. Allows EKS nodes to pull container images without traversing NAT or the internet."
+  type        = bool
+  default     = false
+}
+
 variable "enable_s3_vpc_endpoint" {
   description = "Create a VPC Gateway Endpoint for S3. Reduces data transfer costs and avoids internet routing for S3 traffic from private subnets."
   type        = bool
