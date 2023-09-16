@@ -92,6 +92,17 @@ variable "network_policy" {
   }
 }
 
+variable "auto_upgrade_channel" {
+  description = "Automatic upgrade channel for the AKS cluster. 'patch' applies only patch-level upgrades automatically."
+  type        = string
+  default     = "patch"
+
+  validation {
+    condition     = contains(["none", "patch", "stable", "rapid", "node-image"], var.auto_upgrade_channel)
+    error_message = "auto_upgrade_channel must be one of: none, patch, stable, rapid, node-image."
+  }
+}
+
 variable "enable_defender" {
   description = "Enable Microsoft Defender for Containers on the AKS cluster"
   type        = bool

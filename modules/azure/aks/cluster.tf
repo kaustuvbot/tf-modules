@@ -27,12 +27,13 @@ variable "system_node_pool_max_count" {
 }
 
 resource "azurerm_kubernetes_cluster" "this" {
-  name                    = local.cluster_name
-  location                = var.location
-  resource_group_name     = var.resource_group_name
-  dns_prefix              = "${var.project}-${var.environment}"
-  kubernetes_version      = var.kubernetes_version
-  private_cluster_enabled = var.private_cluster_enabled
+  name                      = local.cluster_name
+  location                  = var.location
+  resource_group_name       = var.resource_group_name
+  dns_prefix                = "${var.project}-${var.environment}"
+  kubernetes_version        = var.kubernetes_version
+  private_cluster_enabled   = var.private_cluster_enabled
+  automatic_channel_upgrade = var.auto_upgrade_channel
 
   api_server_access_profile {
     authorized_ip_ranges = local.api_server_authorized_ip_ranges
