@@ -32,9 +32,10 @@ locals {
 resource "aws_kms_key" "logs" {
   count = var.enable_logs_key ? 1 : 0
 
-  description             = "Encryption key for ${var.project}-${var.environment} logs"
-  deletion_window_in_days = var.deletion_window_in_days
-  enable_key_rotation     = var.enable_key_rotation
+  description                        = "Encryption key for ${var.project}-${var.environment} logs"
+  deletion_window_in_days            = var.deletion_window_in_days
+  enable_key_rotation                = var.enable_key_rotation
+  bypass_policy_lockout_safety_check = var.bypass_policy_lockout_safety_check
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -93,9 +94,10 @@ resource "aws_kms_alias" "logs" {
 resource "aws_kms_key" "state" {
   count = var.enable_state_key ? 1 : 0
 
-  description             = "Encryption key for ${var.project}-${var.environment} Terraform state"
-  deletion_window_in_days = var.deletion_window_in_days
-  enable_key_rotation     = var.enable_key_rotation
+  description                        = "Encryption key for ${var.project}-${var.environment} Terraform state"
+  deletion_window_in_days            = var.deletion_window_in_days
+  enable_key_rotation                = var.enable_key_rotation
+  bypass_policy_lockout_safety_check = var.bypass_policy_lockout_safety_check
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -130,9 +132,10 @@ resource "aws_kms_alias" "state" {
 resource "aws_kms_key" "general" {
   count = var.enable_general_key ? 1 : 0
 
-  description             = "General-purpose encryption key for ${var.project}-${var.environment}"
-  deletion_window_in_days = var.deletion_window_in_days
-  enable_key_rotation     = var.enable_key_rotation
+  description                        = "General-purpose encryption key for ${var.project}-${var.environment}"
+  deletion_window_in_days            = var.deletion_window_in_days
+  enable_key_rotation                = var.enable_key_rotation
+  bypass_policy_lockout_safety_check = var.bypass_policy_lockout_safety_check
 
   policy = jsonencode({
     Version = "2012-10-17"
