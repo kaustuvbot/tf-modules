@@ -38,10 +38,23 @@ jobs:
       fail-fast: false
       matrix:
         module:
+          # AWS modules
           - modules/aws/vpc
           - modules/aws/s3-state
           - modules/aws/dynamodb-lock
           - modules/aws/iam
+          - modules/aws/kms
+          - modules/aws/logging
+          - modules/aws/monitoring
+          - modules/aws/budgets
+          - modules/aws/eks
+          # Azure modules
+          - modules/azure/resource-group
+          - modules/azure/vnet
+          - modules/azure/aks
+          - modules/azure/key-vault
+          - modules/azure/monitoring
+          # Core modules
           - modules/core/naming
           - modules/core/tagging
     steps:
