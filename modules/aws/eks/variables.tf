@@ -185,20 +185,34 @@ variable "enable_managed_addons" {
   default     = true
 }
 
+variable "managed_addon_versions" {
+  description = <<-EOT
+    Map of EKS managed add-on name to version string. Takes precedence over the
+    individual vpc_cni_version, coredns_version, and kube_proxy_version variables.
+    Null values resolve to the latest available version for that add-on.
+    Example: { "vpc-cni" = "v1.16.0-eksbuild.1", "coredns" = null }
+  EOT
+  type        = map(string)
+  default     = {}
+}
+
+# Deprecated: prefer managed_addon_versions = { "vpc-cni" = "<version>" }
 variable "vpc_cni_version" {
-  description = "Version of the vpc-cni managed add-on. null = latest."
+  description = "Deprecated: use managed_addon_versions. Version of the vpc-cni managed add-on. null = latest."
   type        = string
   default     = null
 }
 
+# Deprecated: prefer managed_addon_versions = { "coredns" = "<version>" }
 variable "coredns_version" {
-  description = "Version of the coredns managed add-on. null = latest."
+  description = "Deprecated: use managed_addon_versions. Version of the coredns managed add-on. null = latest."
   type        = string
   default     = null
 }
 
+# Deprecated: prefer managed_addon_versions = { "kube-proxy" = "<version>" }
 variable "kube_proxy_version" {
-  description = "Version of the kube-proxy managed add-on. null = latest."
+  description = "Deprecated: use managed_addon_versions. Version of the kube-proxy managed add-on. null = latest."
   type        = string
   default     = null
 }

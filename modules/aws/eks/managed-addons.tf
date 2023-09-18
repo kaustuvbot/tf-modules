@@ -7,11 +7,18 @@
 # -----------------------------------------------------------------------------
 
 locals {
-  managed_addons = var.enable_managed_addons ? {
+  # Base versions from the deprecated individual variables. These are overridden
+  # by any key present in managed_addon_versions, enabling a migration path.
+  _addon_base_versions = {
     vpc-cni    = var.vpc_cni_version
     coredns    = var.coredns_version
     kube-proxy = var.kube_proxy_version
-  } : {}
+  }
+
+  managed_addons = var.enable_managed_addons ? merge(
+    local._addon_base_versions,
+    var.managed_addon_versions,
+  ) : {}
 }
 
 resource "aws_eks_addon" "this" {
