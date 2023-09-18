@@ -55,6 +55,24 @@ variable "memory_threshold_percent" {
   default     = 80
 }
 
+variable "enable_defender_for_containers" {
+  description = "Enable Microsoft Defender for Containers (AKS threat detection)"
+  type        = bool
+  default     = false
+}
+
+variable "enable_defender_for_keyvault" {
+  description = "Enable Microsoft Defender for Key Vault"
+  type        = bool
+  default     = false
+}
+
+variable "log_analytics_workspace_id" {
+  description = "Log Analytics Workspace ID for Defender diagnostic settings. Required when any Defender plan is enabled."
+  type        = string
+  default     = null
+}
+
 variable "tags" {
   description = "Additional tags to merge with default tags"
   type        = map(string)

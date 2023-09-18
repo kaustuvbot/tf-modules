@@ -79,3 +79,19 @@ resource "azurerm_monitor_metric_alert" "memory" {
     }
   }
 }
+
+# -----------------------------------------------------------------------------
+# Microsoft Defender for Cloud — optional baseline
+# -----------------------------------------------------------------------------
+
+resource "azurerm_security_center_subscription_pricing" "containers" {
+  count         = var.enable_defender_for_containers ? 1 : 0
+  tier          = "Standard"
+  resource_type = "ContainerRegistry"
+}
+
+resource "azurerm_security_center_subscription_pricing" "keyvault" {
+  count         = var.enable_defender_for_keyvault ? 1 : 0
+  tier          = "Standard"
+  resource_type = "KeyVaults"
+}

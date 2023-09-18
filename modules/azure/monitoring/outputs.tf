@@ -12,3 +12,13 @@ output "memory_alert_id" {
   description = "Resource ID of the memory metric alert"
   value       = azurerm_monitor_metric_alert.memory.id
 }
+
+output "defender_containers_enabled" {
+  description = "Whether Defender for Containers is enabled"
+  value       = var.enable_defender_for_containers
+}
+
+output "defender_keyvault_enabled" {
+  description = "Whether Defender for Key Vault is enabled"
+  value       = var.enable_defender_for_keyvault
+}
