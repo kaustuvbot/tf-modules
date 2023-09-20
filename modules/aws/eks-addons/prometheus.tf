@@ -39,6 +39,12 @@ variable "prometheus_storage_size" {
   default     = "20Gi"
 }
 
+variable "enable_alertmanager" {
+  description = "Enable Alertmanager as part of the Prometheus stack"
+  type        = bool
+  default     = true
+}
+
 resource "helm_release" "prometheus" {
   count = var.enable_prometheus ? 1 : 0
 
@@ -64,5 +70,10 @@ resource "helm_release" "prometheus" {
   set {
     name  = "prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage"
     value = var.prometheus_storage_size
+  }
+
+  set {
+    name  = "alertmanager.enabled"
+    value = tostring(var.enable_alertmanager)
   }
 }

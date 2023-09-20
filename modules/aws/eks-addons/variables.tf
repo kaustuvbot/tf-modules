@@ -175,6 +175,12 @@ variable "efs_csi_addon_version" {
   default     = null
 }
 
+variable "enable_alertmanager" {
+  description = "Enable Alertmanager as part of the Prometheus stack"
+  type        = bool
+  default     = true
+}
+
 variable "tags" {
   description = "Additional tags to apply to all add-on resources"
   type        = map(string)
