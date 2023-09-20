@@ -1,51 +1,121 @@
-# Observability Stack
+# Observability Guide
 
-## Overview
+This guide covers the full observability stack available for EKS clusters
+via the `modules/aws/eks-addons` module.
 
-The EKS add-ons module ships optional Helm-based observability components:
+## Stack Overview
 
-| Component | Chart | Default namespace | Flag |
-|-----------|-------|-------------------|------|
-| Prometheus + Grafana + Alertmanager | `kube-prometheus-stack` | `monitoring` | `enable_prometheus` |
-| Loki + Promtail | `loki-stack` | `monitoring` | `enable_loki` |
+| Component | Helm Chart | Purpose |
+|---|---|---|
+| Prometheus | kube-prometheus-stack | Metrics collection, alerting rules |
+| Alertmanager | (part of kube-prometheus) | Alert routing and deduplication |
+| Grafana | grafana | Dashboards and visualization |
+| Loki | loki | Log aggregation |
+| Node Exporter | (part of kube-prometheus) | Node-level metrics |
 
-## Usage
+All components are installed in the `monitoring` namespace.
+
+## Enabling the Stack
 
 ```hcl
 module "eks_addons" {
   source = "../../modules/aws/eks-addons"
-  # ... required vars ...
+  # ... required variables ...
 
-  enable_prometheus      = true
-  prometheus_version     = "55.5.0"
-  grafana_admin_password = var.grafana_password  # use secrets manager in prod
+  # Observability stack
+  enable_prometheus = true
+  prometheus_retention     = "30d"
+  prometheus_storage_size  = "100Gi"
+  enable_alertmanager      = true
 
-  enable_loki    = true
-  loki_version   = "2.10.2"
+  enable_grafana               = true
+  grafana_persistence_enabled  = true
+  grafana_storage_size         = "10Gi"
+
+  enable_loki         = true
+  loki_s3_bucket_name = "my-loki-chunks"
+  loki_irsa_role_arn  = aws_iam_role.loki.arn
 }
 ```
 
 ## Install Ordering
 
-Loki depends on Prometheus (`depends_on = [helm_release.prometheus]`) because it disables its bundled Grafana and expects the Prometheus-stack Grafana to be available. If you enable Loki without Prometheus, remove that `depends_on` or install a standalone Grafana.
+The following dependency graph is enforced via Helm atomic installs and `depends_on`:
 
-## Accessing Grafana
+```
+cert-manager
+    └── alb-controller
+            └── external-dns
 
-Port-forward to the Grafana service:
+prometheus  ──► grafana (data source pre-configured)
 
-```bash
-kubectl -n monitoring port-forward svc/kube-prometheus-stack-grafana 3000:80
+loki        (independent)
 ```
 
-Default credentials: `admin` / value of `grafana_admin_password`.
+## Prometheus Configuration
 
-## Loki Data Source
+### Storage
 
-Add Loki as a Grafana data source pointing to `http://loki-stack:3100`. With Promtail installed, pod logs are automatically shipped.
+Prometheus stores metrics locally on a PVC. Size with:
+- 15-day retention, 1 cluster: ~20–30 GiB
+- 30-day retention, 1 cluster: ~50–80 GiB (depends on workload count)
 
-## Production Considerations
+Use `prometheus_retention` and `prometheus_storage_size` to tune.
 
-- **Storage**: Both Prometheus and Loki default to 20 Gi and 10 Gi PVCs respectively. Size these based on your log/metric volume and retention requirements.
-- **Retention**: Prometheus defaults to 15 days. Adjust `prometheus.prometheusSpec.retention` via `set` overrides or `values` files.
-- **Grafana password**: Pass the password via a secrets manager reference, not a plaintext variable. Use `sensitive = true` and source from AWS Secrets Manager or Vault.
-- **HA**: For production, switch to a HA Prometheus and Loki deployment (e.g., Thanos, Loki distributed mode).
+### Alert Rules
+
+Default alerting rules come from the `kube-prometheus-stack` chart (based on
+the Kubernetes Monitoring Mixin). Custom rules can be added via `PrometheusRule`
+CRDs after the stack is installed.
+
+## Grafana Dashboards
+
+Grafana is pre-configured with Prometheus as the default data source.
+
+Default dashboards included by kube-prometheus-stack:
+- Kubernetes cluster overview
+- Node resource usage
+- Pod resource usage
+- Namespace resource usage
+
+### Accessing Grafana
+
+```bash
+kubectl port-forward -n monitoring svc/grafana 3000:80
+# Open http://localhost:3000
+# Default credentials: admin / prom-operator
+```
+
+## Loki Log Aggregation
+
+Loki stores logs in S3 for durability and cost efficiency.
+
+### S3 Bucket Requirements
+
+The Loki S3 bucket must:
+- Exist before `terraform apply` (or be created in the same root module)
+- Allow the Loki IRSA role to `s3:PutObject`, `s3:GetObject`, `s3:DeleteObject`, `s3:ListBucket`
+- Have versioning and server-side encryption enabled
+
+### Querying Logs
+
+Loki is accessible via Grafana's Explore view. Use LogQL:
+
+```logql
+{namespace="production", app="myapp"} |= "error"
+```
+
+## Cost Considerations
+
+- Prometheus PVC: $0.10/GiB-month (gp3) → ~$5–10/month for standard retention
+- Grafana PVC: minimal (~$1/month)
+- Loki S3: standard S3 pricing — typically $1–5/month for moderate log volumes
+- All components run on existing node groups — no dedicated nodes required
+
+## Upgrading
+
+Chart versions are pinned in variables. To upgrade:
+1. Test new chart version in dev environment
+2. Update `prometheus_version`, `grafana_version`, `loki_version` in your tfvars
+3. Run `terraform plan` and review the Helm diff
+4. Apply in staging, then production
