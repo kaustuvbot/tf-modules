@@ -64,7 +64,7 @@ resource "aws_iam_role_policy_attachment" "cluster_vpc_controller" {
 
 resource "aws_eks_cluster" "this" {
   name     = local.cluster_name
-  version  = var.cluster_version
+  version  = coalesce(var.kubernetes_version, var.cluster_version)
   role_arn = aws_iam_role.cluster.arn
 
   enabled_cluster_log_types = var.enabled_cluster_log_types

@@ -18,8 +18,16 @@ variable "environment" {
   }
 }
 
+# Deprecated: use kubernetes_version instead. Kept for backward compatibility.
+# When both are set, kubernetes_version takes precedence.
 variable "cluster_version" {
-  description = "Kubernetes version for the EKS cluster"
+  description = "Deprecated: use kubernetes_version. Kubernetes version for the EKS cluster."
+  type        = string
+  default     = null
+}
+
+variable "kubernetes_version" {
+  description = "Kubernetes version for the EKS cluster. Supersedes the deprecated cluster_version variable."
   type        = string
   default     = "1.28"
 }
