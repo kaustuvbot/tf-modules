@@ -132,10 +132,10 @@ resource "aws_route" "private_nat" {
 }
 
 resource "aws_route_table_association" "private" {
-  count = local.private_subnet_count
+  for_each = local.private_subnet_route_table_index
 
-  subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private[var.single_nat_gateway ? 0 : count.index].id
+  subnet_id      = aws_subnet.private[each.key].id
+  route_table_id = aws_route_table.private[each.value].id
 }
 
 # -----------------------------------------------------------------------------

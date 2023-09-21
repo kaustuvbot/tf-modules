@@ -20,4 +20,14 @@ locals {
     ? (var.single_nat_gateway ? 1 : local.az_count)
     : 0
   )
+
+  # Map of private subnet index → route table index.
+  # When single_nat_gateway=true all private subnets share route table [0].
+  # When single_nat_gateway=false each AZ gets its own route table.
+  # This map is used by aws_route_table_association.private to avoid
+  # embedding conditional logic inline in the resource for_each argument.
+  private_subnet_route_table_index = {
+    for i in range(local.private_subnet_count) :
+    i => var.single_nat_gateway ? 0 : i
+  }
 }
