@@ -1,5 +1,5 @@
 output "vpc_id" {
-  description = "The ID of the VPC"
+  description = "ID of the VPC. Pass to eks.vpc_id, security groups, and other resources that need vpc_id."
   value       = aws_vpc.this.id
 }
 
@@ -9,12 +9,12 @@ output "vpc_cidr" {
 }
 
 output "public_subnet_ids" {
-  description = "List of public subnet IDs"
+  description = "List of public subnet IDs, one per AZ. Use for load balancers, NAT gateways, and bastion hosts."
   value       = aws_subnet.public[*].id
 }
 
 output "private_subnet_ids" {
-  description = "List of private subnet IDs"
+  description = "List of private subnet IDs, one per AZ. Pass to eks.subnet_ids for node group placement."
   value       = aws_subnet.private[*].id
 }
 
@@ -34,7 +34,7 @@ output "public_route_table_id" {
 }
 
 output "private_route_table_ids" {
-  description = "List of private route table IDs"
+  description = "List of private route table IDs. Length is 1 when single_nat_gateway=true, otherwise equals the AZ count."
   value       = aws_route_table.private[*].id
 }
 

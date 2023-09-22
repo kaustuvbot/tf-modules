@@ -1,20 +1,20 @@
 output "cluster_id" {
-  description = "The EKS cluster ID"
+  description = "ID of the EKS cluster. Equivalent to cluster_name for EKS."
   value       = aws_eks_cluster.this.id
 }
 
 output "cluster_name" {
-  description = "The EKS cluster name"
+  description = "Name of the EKS cluster. Pass to eks-addons.cluster_name."
   value       = aws_eks_cluster.this.name
 }
 
 output "cluster_arn" {
-  description = "ARN of the EKS cluster"
+  description = "ARN of the EKS cluster. Use for IAM policy conditions and CloudWatch log group naming."
   value       = aws_eks_cluster.this.arn
 }
 
 output "cluster_endpoint" {
-  description = "The EKS cluster API endpoint"
+  description = "HTTPS endpoint of the EKS API server. Pass to eks-addons.cluster_endpoint and Kubernetes provider host."
   value       = aws_eks_cluster.this.endpoint
 }
 
