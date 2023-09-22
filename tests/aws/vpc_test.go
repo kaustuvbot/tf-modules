@@ -85,4 +85,12 @@ func TestVpcHappyPath(t *testing.T) {
 	assert.Equal(t, project, vpcTags["Project"])
 	assert.Equal(t, "dev", vpcTags["Environment"])
 	assert.Equal(t, "terraform", vpcTags["ManagedBy"])
+
+	// Validate private route tables (single_nat_gateway=true and NAT disabled → 1 route table).
+	// This also exercises the for_each route table association refactor introduced in C177.
+	privateRTIDs := terraform.OutputList(t, opts, "private_route_table_ids")
+	assert.Len(t, privateRTIDs, 1, "expected 1 private route table when single_nat_gateway=true")
+
+	// Re-assert private subnet count explicitly for regression protection
+	assert.Equal(t, 2, len(privateSubnetIDs), "private subnet count must remain 2")
 }
