@@ -24,6 +24,16 @@ resource "aws_launch_template" "node" {
     })
   }
 
+  # Tag EBS root volumes so they appear in cost allocation reports and
+  # are correctly attributed to the node group that owns them.
+  tag_specifications {
+    resource_type = "volume"
+    tags = merge(local.common_tags, {
+      Name      = "${local.cluster_name}-${each.key}-root"
+      NodeGroup = each.key
+    })
+  }
+
   lifecycle {
     create_before_destroy = true
   }
