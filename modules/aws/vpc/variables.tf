@@ -91,3 +91,32 @@ variable "enable_ssm_vpc_endpoints" {
   type        = bool
   default     = false
 }
+
+variable "enable_route53_health_check" {
+  description = "Create a Route53 health check targeting the VPC's primary public endpoint. Used for DNS failover routing."
+  type        = bool
+  default     = false
+}
+
+variable "route53_health_check_fqdn" {
+  description = "FQDN to health-check. Required when enable_route53_health_check=true."
+  type        = string
+  default     = null
+}
+
+variable "route53_health_check_port" {
+  description = "Port to health-check. Defaults to 443."
+  type        = number
+  default     = 443
+}
+
+variable "route53_health_check_type" {
+  description = "Health check protocol: HTTP, HTTPS, or TCP"
+  type        = string
+  default     = "HTTPS"
+
+  validation {
+    condition     = contains(["HTTP", "HTTPS", "TCP"], var.route53_health_check_type)
+    error_message = "route53_health_check_type must be HTTP, HTTPS, or TCP."
+  }
+}

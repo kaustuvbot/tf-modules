@@ -66,3 +66,8 @@ output "availability_zones" {
   description = "List of availability zones used for subnet placement. Mirrors the var.availability_zones input after validation."
   value       = var.availability_zones
 }
+
+output "route53_health_check_id" {
+  description = "ID of the Route53 health check, or null if not enabled"
+  value       = var.enable_route53_health_check ? aws_route53_health_check.this[0].id : null
+}
