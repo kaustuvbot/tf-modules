@@ -27,9 +27,14 @@ variable "cluster_version" {
 }
 
 variable "kubernetes_version" {
-  description = "Kubernetes version for the EKS cluster. Supersedes the deprecated cluster_version variable."
+  description = "Kubernetes version for the EKS cluster. Supersedes the deprecated cluster_version variable. Must be in MAJOR.MINOR format (e.g. \"1.29\")."
   type        = string
   default     = "1.28"
+
+  validation {
+    condition     = can(regex("^\\d+\\.\\d+$", var.kubernetes_version))
+    error_message = "kubernetes_version must be in MAJOR.MINOR format, e.g. \"1.29\". Do not include a patch version or 'v' prefix."
+  }
 }
 
 variable "vpc_id" {

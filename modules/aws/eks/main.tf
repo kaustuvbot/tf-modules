@@ -12,6 +12,16 @@
 #   - Managed add-ons (managed-addons.tf)
 # -----------------------------------------------------------------------------
 
+# Warn when both kubernetes_version and the deprecated cluster_version are set.
+# coalesce() will silently favour kubernetes_version, so the cluster_version
+# value is ignored. Surfacing this at plan time avoids silent misconfiguration.
+check "kubernetes_version_mutual_exclusion" {
+  assert {
+    condition     = !(var.cluster_version != null && var.kubernetes_version != "1.28")
+    error_message = "Both kubernetes_version and the deprecated cluster_version are set. Remove cluster_version — kubernetes_version takes precedence and cluster_version is ignored."
+  }
+}
+
 # -----------------------------------------------------------------------------
 # CloudWatch Log Group
 # -----------------------------------------------------------------------------
