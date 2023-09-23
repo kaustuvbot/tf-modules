@@ -55,6 +55,11 @@ output "oidc_issuer_url" {
   value       = replace(aws_iam_openid_connect_provider.eks.url, "https://", "")
 }
 
+output "cluster_autoscaler_role_arn" {
+  description = "ARN of the IRSA role for Cluster Autoscaler. Empty string when enable_cluster_autoscaler_irsa=false."
+  value       = var.enable_cluster_autoscaler_irsa ? aws_iam_role.cluster_autoscaler[0].arn : ""
+}
+
 output "psa_namespace_labels" {
   description = "Map of namespace to Pod Security Admission enforce label. Apply these as Kubernetes namespace labels after cluster creation."
   value = {

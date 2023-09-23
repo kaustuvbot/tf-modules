@@ -107,6 +107,12 @@ variable "cluster_log_retention_days" {
   }
 }
 
+variable "enable_cluster_autoscaler_irsa" {
+  description = "Create an IRSA IAM role for the Kubernetes Cluster Autoscaler. Set true when running Cluster Autoscaler (not Karpenter) to allow it to describe and modify EC2 Auto Scaling groups."
+  type        = bool
+  default     = false
+}
+
 variable "enabled_cluster_log_types" {
   description = "List of EKS control plane log types to enable"
   type        = list(string)
