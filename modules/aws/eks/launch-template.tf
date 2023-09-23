@@ -3,12 +3,28 @@
 # -----------------------------------------------------------------------------
 # Enforces IMDSv2 and restricts metadata endpoint hop limit to 1 so that
 # pods cannot reach the instance metadata service directly.
+# Sets the root EBS volume size from node_groups[*].disk_size (default 50 GB).
 # -----------------------------------------------------------------------------
 
 resource "aws_launch_template" "node" {
   for_each = var.node_groups
 
   name_prefix = "${local.cluster_name}-${each.key}-"
+
+  # Configure the root EBS volume with the size specified in the node group
+  # definition. Without this block the managed node group defaults to 20 GB,
+  # silently ignoring the disk_size field. gp3 gives better baseline IOPS than
+  # gp2 at the same cost, and encrypted=true satisfies CIS Benchmark 5.1.1.
+  block_device_mappings {
+    device_name = "/dev/xvda"
+
+    ebs {
+      volume_size           = each.value.disk_size
+      volume_type           = "gp3"
+      encrypted             = true
+      delete_on_termination = true
+    }
+  }
 
   metadata_options {
     http_endpoint               = "enabled"
