@@ -97,6 +97,18 @@ variable "cert_manager_version" {
   default     = "1.13.3"
 }
 
+variable "enable_node_termination_handler" {
+  description = "Install the AWS Node Termination Handler (NTH) to gracefully drain SPOT nodes before reclamation. Enable when any node group uses capacity_type = SPOT."
+  type        = bool
+  default     = false
+}
+
+variable "node_termination_handler_version" {
+  description = "Helm chart version for AWS Node Termination Handler"
+  type        = string
+  default     = "0.21.0"
+}
+
 variable "tags" {
   description = "Additional tags to apply to all add-on resources"
   type        = map(string)
