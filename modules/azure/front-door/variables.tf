@@ -64,6 +64,14 @@ variable "routes" {
   default = {}
 }
 
+variable "security_policies" {
+  description = "Map of security policy configurations. Key = policy name, value = security settings."
+  type = map(object({
+    waf_policy_id = optional(string, null)
+  }))
+  default = {}
+}
+
 variable "tags" {
   description = "Additional tags to apply to Front Door resources"
   type        = map(string)
