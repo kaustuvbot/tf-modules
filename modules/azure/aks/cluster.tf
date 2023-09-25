@@ -26,6 +26,23 @@ variable "system_node_pool_max_count" {
   default     = 3
 }
 
+variable "system_node_pool_os_disk_size_gb" {
+  description = "OS disk size in GB for system node pool nodes. Set to 0 to use the default for the VM size."
+  type        = number
+  default     = 128
+}
+
+variable "system_node_pool_os_disk_type" {
+  description = "OS disk type for system node pool nodes. 'Ephemeral' uses the VM's local NVMe/SSD for faster node provisioning and lower cost; requires a VM size with sufficient cache or temp disk."
+  type        = string
+  default     = "Managed"
+
+  validation {
+    condition     = contains(["Managed", "Ephemeral"], var.system_node_pool_os_disk_type)
+    error_message = "system_node_pool_os_disk_type must be one of: Managed, Ephemeral."
+  }
+}
+
 resource "azurerm_kubernetes_cluster" "this" {
   name                      = local.cluster_name
   location                  = var.location
@@ -47,6 +64,8 @@ resource "azurerm_kubernetes_cluster" "this" {
     node_count          = var.system_node_pool_node_count
     min_count           = var.system_node_pool_min_count
     max_count           = var.system_node_pool_max_count
+    os_disk_size_gb     = var.system_node_pool_os_disk_size_gb
+    os_disk_type        = var.system_node_pool_os_disk_type
 
     upgrade_settings {
       max_surge = "33%"
