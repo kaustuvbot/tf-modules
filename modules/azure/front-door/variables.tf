@@ -37,13 +37,29 @@ variable "sku_name" {
 variable "origins" {
   description = "Map of origin configurations. Key = origin name, value = origin settings."
   type = map(object({
-    host_name           = string
-    http_port           = optional(number, 80)
-    https_port          = optional(number, 443)
-    origin_host_header  = optional(string, null)
-    priority            = optional(number, 1)
-    weight              = optional(number, 1000)
-    enabled             = optional(bool, true)
+    host_name          = string
+    http_port          = optional(number, 80)
+    https_port         = optional(number, 443)
+    origin_host_header = optional(string, null)
+    priority           = optional(number, 1)
+    weight             = optional(number, 1000)
+    enabled            = optional(bool, true)
+  }))
+  default = {}
+}
+
+variable "routes" {
+  description = "Map of routing rule configurations. Key = route name, value = route settings."
+  type = map(object({
+    patterns_to_match           = list(string)
+    supported_protocols         = list(string)
+    forwarding_protocol         = optional(string, "HttpsOnly")
+    https_redirect_enabled      = optional(bool, true)
+    link_to_default_domain      = optional(bool, true)
+    enabled                     = optional(bool, true)
+    cache_enabled               = optional(bool, false)
+    cache_query_string_behavior = optional(string, "IgnoreQueryString")
+    cache_compression_enabled   = optional(bool, true)
   }))
   default = {}
 }
