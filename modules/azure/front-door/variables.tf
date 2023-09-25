@@ -72,6 +72,20 @@ variable "security_policies" {
   default = {}
 }
 
+variable "health_probe" {
+  description = "Health probe and load balancing settings for origin group"
+  type = object({
+    interval_in_seconds                = optional(number, 30)
+    path                               = optional(string, "/")
+    protocol                           = optional(string, "Https")
+    request_type                       = optional(string, "HEAD")
+    sample_size                        = optional(number, 4)
+    successful_samples_required        = optional(number, 3)
+    additional_latency_in_milliseconds = optional(number, 50)
+  })
+  default = {}
+}
+
 variable "tags" {
   description = "Additional tags to apply to Front Door resources"
   type        = map(string)

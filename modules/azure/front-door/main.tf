@@ -28,16 +28,16 @@ resource "azurerm_cdn_frontdoor_origin_group" "this" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.this.id
 
   load_balancing {
-    sample_size                        = 4
-    successful_samples_required        = 3
-    additional_latency_in_milliseconds = 50
+    sample_size                        = var.health_probe.sample_size
+    successful_samples_required        = var.health_probe.successful_samples_required
+    additional_latency_in_milliseconds = var.health_probe.additional_latency_in_milliseconds
   }
 
   health_probe {
-    interval_in_seconds = 30
-    path                = "/"
-    protocol            = "Https"
-    request_type        = "HEAD"
+    interval_in_seconds = var.health_probe.interval_in_seconds
+    path                = var.health_probe.path
+    protocol            = var.health_probe.protocol
+    request_type        = var.health_probe.request_type
   }
 }
 
