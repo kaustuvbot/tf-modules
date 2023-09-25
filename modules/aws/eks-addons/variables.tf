@@ -34,8 +34,13 @@ variable "oidc_provider_arn" {
 }
 
 variable "oidc_provider_url" {
-  description = "URL of the EKS OIDC provider (without https://)"
+  description = "URL of the EKS OIDC provider, including the https:// scheme. Passed as-is to IRSA trust policies."
   type        = string
+
+  validation {
+    condition     = startswith(var.oidc_provider_url, "https://")
+    error_message = "oidc_provider_url must include the https:// scheme, e.g. \"https://oidc.eks.us-east-1.amazonaws.com/id/EXAMPLE\"."
+  }
 }
 
 variable "vpc_id" {
@@ -80,9 +85,17 @@ variable "external_dns_version" {
 }
 
 variable "route53_zone_ids" {
-  description = "List of Route53 hosted zone IDs for ExternalDNS to manage"
+  description = "List of Route53 hosted zone IDs for ExternalDNS to manage. Each ID must start with 'Z' (the standard AWS hosted zone ID prefix)."
   type        = list(string)
   default     = []
+
+  validation {
+    condition = alltrue([
+      for id in var.route53_zone_ids :
+      startswith(id, "Z") && length(id) >= 14
+    ])
+    error_message = "Each route53_zone_ids entry must be a valid Route53 hosted zone ID starting with 'Z' and at least 14 characters long."
+  }
 }
 
 variable "enable_cert_manager" {
