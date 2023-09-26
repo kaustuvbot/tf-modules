@@ -85,6 +85,16 @@ variable "node_groups" {
     ])
     error_message = "capacity_type must be ON_DEMAND or SPOT for each node group."
   }
+
+  # AWS recommends at least 2 instance types for SPOT capacity pools to reduce
+  # the probability of full node group outage on a single instance type interruption.
+  validation {
+    condition = alltrue([
+      for ng in values(var.node_groups) :
+      ng.capacity_type != "SPOT" || length(ng.instance_types) >= 2
+    ])
+    error_message = "SPOT node groups must specify at least 2 instance_types for capacity pool diversification. AWS best practice: use 3+ types from different families."
+  }
 }
 
 variable "kms_key_arn" {
