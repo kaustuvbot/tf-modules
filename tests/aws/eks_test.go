@@ -65,19 +65,23 @@ func TestEksSmokeTest(t *testing.T) {
 	eksOpts := &terraform.Options{
 		TerraformDir: "../../modules/aws/eks",
 		Vars: map[string]interface{}{
-			"project":         project,
-			"environment":     "dev",
-			"cluster_version": "1.28",
-			"vpc_id":          vpcID,
-			"subnet_ids":      privateSubnetIDs,
+			"project":            project,
+			"environment":        "dev",
+			"kubernetes_version": "1.28",
+			"vpc_id":             vpcID,
+			"subnet_ids":         privateSubnetIDs,
 			"node_groups": map[string]interface{}{
 				"default": map[string]interface{}{
 					"instance_types": []string{"t3.small"},
 					"desired_size":   1,
 					"min_size":       1,
 					"max_size":       2,
+					// Validate disk_size is passed through to the launch template
+					"disk_size": 60,
 				},
 			},
+			// Enable IRSA role so we can validate cluster_autoscaler_role_arn
+			"enable_cluster_autoscaler_irsa": true,
 			// Disable all logs in tests to reduce cost
 			"enabled_cluster_log_types": []string{},
 		},
@@ -105,4 +109,9 @@ func TestEksSmokeTest(t *testing.T) {
 
 	nodeRoleARN := terraform.Output(t, eksOpts, "node_group_role_arn")
 	assert.NotEmpty(t, nodeRoleARN, "node_group_role_arn should be set")
+
+	// Validate cluster autoscaler IRSA role ARN (enabled above)
+	caRoleARN := terraform.Output(t, eksOpts, "cluster_autoscaler_role_arn")
+	assert.NotEmpty(t, caRoleARN, "cluster_autoscaler_role_arn should be set when enable_cluster_autoscaler_irsa=true")
+	assert.Contains(t, caRoleARN, ":role/", "cluster_autoscaler_role_arn should be a valid IAM role ARN")
 }
