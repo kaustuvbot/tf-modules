@@ -122,6 +122,18 @@ variable "node_termination_handler_version" {
   default     = "0.21.0"
 }
 
+variable "enable_sealed_secrets" {
+  description = "Install the Bitnami Sealed Secrets controller, enabling GitOps-safe encrypted secret management. SealedSecret resources are encrypted with the controller's key and safe to commit to version control."
+  type        = bool
+  default     = false
+}
+
+variable "sealed_secrets_version" {
+  description = "Helm chart version for Sealed Secrets controller"
+  type        = string
+  default     = "2.15.0"
+}
+
 variable "tags" {
   description = "Additional tags to apply to all add-on resources"
   type        = map(string)
