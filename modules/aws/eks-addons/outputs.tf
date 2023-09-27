@@ -22,3 +22,13 @@ output "loki_namespace" {
   description = "Namespace where Loki is installed"
   value       = var.enable_loki ? var.loki_namespace : null
 }
+
+output "karpenter_role_arn" {
+  description = "ARN of the Karpenter controller IRSA role, or null when enable_karpenter=false"
+  value       = var.enable_karpenter ? aws_iam_role.karpenter[0].arn : null
+}
+
+output "karpenter_sqs_queue_url" {
+  description = "URL of the SQS interruption queue used by Karpenter, or null when enable_karpenter=false"
+  value       = var.enable_karpenter ? aws_sqs_queue.karpenter[0].url : null
+}

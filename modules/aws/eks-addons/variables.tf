@@ -134,6 +134,24 @@ variable "sealed_secrets_version" {
   default     = "2.15.0"
 }
 
+variable "enable_karpenter" {
+  description = "Install Karpenter node autoscaler. When enabled, creates an IRSA role with EC2/SQS/SSM permissions and an SQS queue for SPOT interruption handling. Mutually exclusive with enable_cluster_autoscaler_irsa on the EKS module."
+  type        = bool
+  default     = false
+}
+
+variable "karpenter_version" {
+  description = "Helm chart version for Karpenter"
+  type        = string
+  default     = "0.37.0"
+}
+
+variable "karpenter_namespace" {
+  description = "Kubernetes namespace to install Karpenter into"
+  type        = string
+  default     = "kube-system"
+}
+
 variable "tags" {
   description = "Additional tags to apply to all add-on resources"
   type        = map(string)
