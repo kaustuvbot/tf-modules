@@ -34,3 +34,18 @@ output "user_node_pool_ids" {
   description = "Map of user node pool name to resource ID"
   value       = { for k, v in azurerm_kubernetes_cluster_node_pool.user : k => v.id }
 }
+
+output "node_resource_group" {
+  description = "Name of the auto-generated resource group containing AKS node VMs, disks, and NICs. Required when assigning RBAC roles to node infrastructure."
+  value       = azurerm_kubernetes_cluster.this.node_resource_group
+}
+
+output "fqdn" {
+  description = "FQDN of the AKS cluster API server. Populated only when private_cluster_enabled=false; null for private clusters (use private_fqdn instead)."
+  value       = var.private_cluster_enabled ? null : azurerm_kubernetes_cluster.this.fqdn
+}
+
+output "private_fqdn" {
+  description = "Private FQDN of the AKS cluster API server. Populated only when private_cluster_enabled=true."
+  value       = var.private_cluster_enabled ? azurerm_kubernetes_cluster.this.private_fqdn : null
+}
