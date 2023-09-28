@@ -45,7 +45,7 @@ variable "origins" {
     weight             = optional(number, 1000)
     enabled            = optional(bool, true)
   }))
-  default = {}
+  default = null
 }
 
 variable "routes" {
@@ -61,7 +61,7 @@ variable "routes" {
     cache_query_string_behavior = optional(string, "IgnoreQueryString")
     cache_compression_enabled   = optional(bool, true)
   }))
-  default = {}
+  default = null
 }
 
 variable "security_policies" {
@@ -69,7 +69,7 @@ variable "security_policies" {
   type = map(object({
     waf_policy_id = optional(string, null)
   }))
-  default = {}
+  default = null
 }
 
 variable "health_probe" {
@@ -83,7 +83,7 @@ variable "health_probe" {
     successful_samples_required        = optional(number, 3)
     additional_latency_in_milliseconds = optional(number, 50)
   })
-  default = {}
+  default = null
 }
 
 variable "tags" {

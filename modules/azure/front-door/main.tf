@@ -8,6 +8,19 @@ locals {
   }
 
   tags = merge(local.default_tags, var.tags)
+
+  origins           = var.origins != null ? var.origins : {}
+  routes            = var.routes != null ? var.routes : {}
+  security_policies = var.security_policies != null ? var.security_policies : {}
+  health_probe = var.health_probe != null ? var.health_probe : {
+    interval_in_seconds                = 30
+    path                               = "/"
+    protocol                           = "Https"
+    request_type                       = "HEAD"
+    sample_size                        = 4
+    successful_samples_required        = 3
+    additional_latency_in_milliseconds = 50
+  }
 }
 
 resource "azurerm_cdn_frontdoor_profile" "this" {
@@ -28,21 +41,21 @@ resource "azurerm_cdn_frontdoor_origin_group" "this" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.this.id
 
   load_balancing {
-    sample_size                        = var.health_probe.sample_size
-    successful_samples_required        = var.health_probe.successful_samples_required
-    additional_latency_in_milliseconds = var.health_probe.additional_latency_in_milliseconds
+    sample_size                        = local.health_probe.sample_size
+    successful_samples_required        = local.health_probe.successful_samples_required
+    additional_latency_in_milliseconds = local.health_probe.additional_latency_in_milliseconds
   }
 
   health_probe {
-    interval_in_seconds = var.health_probe.interval_in_seconds
-    path                = var.health_probe.path
-    protocol            = var.health_probe.protocol
-    request_type        = var.health_probe.request_type
+    interval_in_seconds = local.health_probe.interval_in_seconds
+    path                = local.health_probe.path
+    protocol            = local.health_probe.protocol
+    request_type        = local.health_probe.request_type
   }
 }
 
 resource "azurerm_cdn_frontdoor_origin" "this" {
-  for_each = var.origins
+  for_each = local.origins
 
   name                           = each.key
   cdn_frontdoor_origin_group_id  = azurerm_cdn_frontdoor_origin_group.this.id

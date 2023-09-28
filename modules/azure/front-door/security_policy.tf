@@ -1,5 +1,5 @@
 resource "azurerm_cdn_frontdoor_security_policy" "this" {
-  for_each = var.security_policies
+  for_each = local.security_policies
 
   name                     = "sec-${local.name_prefix}-${each.key}"
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.this.id

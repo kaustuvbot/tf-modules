@@ -1,5 +1,5 @@
 resource "azurerm_cdn_frontdoor_route" "this" {
-  for_each = var.routes
+  for_each = local.routes
 
   name                      = each.key
   cdn_frontdoor_endpoint_id = azurerm_cdn_frontdoor_endpoint.this.id
