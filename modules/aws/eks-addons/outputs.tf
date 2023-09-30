@@ -32,3 +32,8 @@ output "karpenter_sqs_queue_url" {
   description = "URL of the SQS interruption queue used by Karpenter, or null when enable_karpenter=false"
   value       = var.enable_karpenter ? aws_sqs_queue.karpenter[0].url : null
 }
+
+output "efs_csi_addon_id" {
+  description = "ID of the EFS CSI Driver managed add-on (cluster_name:addon_name), or null when enable_efs_csi_driver=false"
+  value       = var.enable_efs_csi_driver ? aws_eks_addon.efs_csi[0].id : null
+}

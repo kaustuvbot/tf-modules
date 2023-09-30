@@ -152,6 +152,29 @@ variable "karpenter_namespace" {
   default     = "kube-system"
 }
 
+variable "enable_efs_csi_driver" {
+  description = "Install the AWS EFS CSI Driver managed add-on to enable ReadWriteMany persistent volumes backed by EFS. Requires efs_file_system_id to be set."
+  type        = bool
+  default     = false
+}
+
+variable "efs_file_system_id" {
+  description = "EFS file system ID used by the EFS CSI Driver for the default StorageClass. Required when enable_efs_csi_driver=true."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = !(var.enable_efs_csi_driver && var.efs_file_system_id == null)
+    error_message = "efs_file_system_id must be set when enable_efs_csi_driver=true."
+  }
+}
+
+variable "efs_csi_addon_version" {
+  description = "Version of the AWS EFS CSI Driver managed add-on. null = latest available for the cluster version."
+  type        = string
+  default     = null
+}
+
 variable "tags" {
   description = "Additional tags to apply to all add-on resources"
   type        = map(string)
