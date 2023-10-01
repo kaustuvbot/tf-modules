@@ -1,6 +1,7 @@
 package aws_test
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -54,4 +55,39 @@ func TestLoggingSmokeTest(t *testing.T) {
 	// CloudTrail is disabled so cloudtrail_arn should be empty
 	cloudtrailARN := terraform.Output(t, tfOpts, "cloudtrail_arn")
 	assert.Empty(t, cloudtrailARN, "cloudtrail_arn should be empty when enable_cloudtrail=false")
+}
+
+// TestLoggingWithCloudTrail validates logging module with CloudTrail enabled.
+func TestLoggingWithCloudTrail(t *testing.T) {
+	t.Skip("Skipping to avoid CloudTrail charges — enable manually")
+
+	region := testRegion
+	if r := os.Getenv("AWS_REGION"); r != "" {
+		region = r
+	}
+
+	uid := uniqueID(t)
+	project := fmt.Sprintf("test-%s", uid)
+
+	opts := &terraform.Options{
+		TerraformDir: "../../modules/aws/logging",
+		Vars: map[string]interface{}{
+			"project":            project,
+			"environment":        "dev",
+			"retention_in_days": 7,
+			"enable_cloudtrail": true,
+			"enable_config":     false,
+			"enable_guardduty":  false,
+		},
+		EnvVars: map[string]string{
+			"AWS_DEFAULT_REGION": region,
+		},
+	}
+
+	defer terraform.Destroy(t, opts)
+	terraform.InitAndApply(t, opts)
+
+	// CloudTrail trail should be created
+	trailArn := terraform.Output(t, opts, "cloudtrail_arn")
+	assert.NotEmpty(t, trailArn, "cloudtrail_arn should not be empty when enable_cloudtrail=true")
 }
