@@ -54,6 +54,30 @@ variable "enable_aws_managed_sql_injection" {
   default     = false
 }
 
+variable "enable_aws_managed_ip_reputation" {
+  description = "Enable the AWS Managed Rules Anonymous IP List (VPN, proxy, TOR exit nodes)"
+  type        = bool
+  default     = false
+}
+
+variable "enable_per_uri_rate_limiting" {
+  description = "Enable per-URI rate limiting (stricter limits for specific paths)"
+  type        = bool
+  default     = false
+}
+
+variable "per_uri_rate_limit_uri" {
+  description = "URI path to apply stricter rate limiting (e.g., /api/login)"
+  type        = string
+  default     = "/api/*"
+}
+
+variable "per_uri_rate_limit_threshold" {
+  description = "Rate limit threshold for per-URI rate limiting"
+  type        = number
+  default     = 100
+}
+
 variable "alb_arn_list" {
   description = "List of ALB ARNs to associate this Web ACL with. Empty list = no association."
   type        = list(string)

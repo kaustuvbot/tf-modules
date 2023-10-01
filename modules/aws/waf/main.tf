@@ -119,6 +119,69 @@ resource "aws_wafv2_web_acl" "this" {
     }
   }
 
+  dynamic "rule" {
+    for_each = var.enable_aws_managed_ip_reputation ? [1] : []
+    content {
+      name     = "AWSManagedRulesAnonymousIPList"
+      priority = 40
+
+      override_action {
+        none {}
+      }
+
+      statement {
+        managed_rule_group_statement {
+          name        = "AWSManagedRulesAnonymousIPList"
+          vendor_name = "AWS"
+        }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "AWSManagedRulesAnonymousIPList"
+        sampled_requests_enabled   = true
+      }
+    }
+  }
+
+  dynamic "rule" {
+    for_each = var.enable_per_uri_rate_limiting ? [1] : []
+    content {
+      name     = "RateLimitPerURI"
+      priority = 2
+
+      action {
+        block {}
+      }
+
+      statement {
+        rate_based_statement {
+          limit              = var.per_uri_rate_limit_threshold
+          aggregate_key_type = "IP"
+        }
+
+        and_statement {
+          byte_match_statement {
+            field_to_match {
+              uri_path {}
+            }
+            string_match = var.per_uri_rate_limit_uri
+            text_transformations {
+              priority = 1
+              type     = "NONE"
+            }
+          }
+        }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "RateLimitPerURI"
+        sampled_requests_enabled   = true
+      }
+    }
+  }
+
   visibility_config {
     cloudwatch_metrics_enabled = true
     metric_name                = "waf-${local.name_prefix}"
