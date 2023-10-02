@@ -47,8 +47,8 @@ resource "aws_wafv2_web_acl" "this" {
   dynamic "rule" {
     for_each = var.enable_aws_managed_common_ruleset ? [1] : []
     content {
-      name     = "AWSManagedRulesCommonRuleSet"
-      priority = 10
+      name     = local.managed_rule_groups.common.name
+      priority = local.managed_rule_groups.common.priority
 
       override_action {
         none {}
@@ -56,14 +56,14 @@ resource "aws_wafv2_web_acl" "this" {
 
       statement {
         managed_rule_group_statement {
-          name        = "AWSManagedRulesCommonRuleSet"
+          name        = local.managed_rule_groups.common.name
           vendor_name = "AWS"
         }
       }
 
       visibility_config {
         cloudwatch_metrics_enabled = true
-        metric_name                = "AWSManagedRulesCommonRuleSet"
+        metric_name                = local.managed_rule_groups.common.name
         sampled_requests_enabled   = true
       }
     }
@@ -72,8 +72,8 @@ resource "aws_wafv2_web_acl" "this" {
   dynamic "rule" {
     for_each = var.enable_aws_managed_bad_inputs ? [1] : []
     content {
-      name     = "AWSManagedRulesKnownBadInputsRuleSet"
-      priority = 20
+      name     = local.managed_rule_groups.bad_inputs.name
+      priority = local.managed_rule_groups.bad_inputs.priority
 
       override_action {
         none {}
@@ -81,14 +81,14 @@ resource "aws_wafv2_web_acl" "this" {
 
       statement {
         managed_rule_group_statement {
-          name        = "AWSManagedRulesKnownBadInputsRuleSet"
+          name        = local.managed_rule_groups.bad_inputs.name
           vendor_name = "AWS"
         }
       }
 
       visibility_config {
         cloudwatch_metrics_enabled = true
-        metric_name                = "AWSManagedRulesKnownBadInputsRuleSet"
+        metric_name                = local.managed_rule_groups.bad_inputs.name
         sampled_requests_enabled   = true
       }
     }
@@ -97,8 +97,8 @@ resource "aws_wafv2_web_acl" "this" {
   dynamic "rule" {
     for_each = var.enable_aws_managed_sql_injection ? [1] : []
     content {
-      name     = "AWSManagedRulesSQLiRuleSet"
-      priority = 30
+      name     = local.managed_rule_groups.sql_injection.name
+      priority = local.managed_rule_groups.sql_injection.priority
 
       override_action {
         none {}
@@ -106,14 +106,14 @@ resource "aws_wafv2_web_acl" "this" {
 
       statement {
         managed_rule_group_statement {
-          name        = "AWSManagedRulesSQLiRuleSet"
+          name        = local.managed_rule_groups.sql_injection.name
           vendor_name = "AWS"
         }
       }
 
       visibility_config {
         cloudwatch_metrics_enabled = true
-        metric_name                = "AWSManagedRulesSQLiRuleSet"
+        metric_name                = local.managed_rule_groups.sql_injection.name
         sampled_requests_enabled   = true
       }
     }
@@ -122,8 +122,8 @@ resource "aws_wafv2_web_acl" "this" {
   dynamic "rule" {
     for_each = var.enable_aws_managed_ip_reputation ? [1] : []
     content {
-      name     = "AWSManagedRulesAnonymousIPList"
-      priority = 40
+      name     = local.managed_rule_groups.ip_reputation.name
+      priority = local.managed_rule_groups.ip_reputation.priority
 
       override_action {
         none {}
@@ -131,14 +131,14 @@ resource "aws_wafv2_web_acl" "this" {
 
       statement {
         managed_rule_group_statement {
-          name        = "AWSManagedRulesAnonymousIPList"
+          name        = local.managed_rule_groups.ip_reputation.name
           vendor_name = "AWS"
         }
       }
 
       visibility_config {
         cloudwatch_metrics_enabled = true
-        metric_name                = "AWSManagedRulesAnonymousIPList"
+        metric_name                = local.managed_rule_groups.ip_reputation.name
         sampled_requests_enabled   = true
       }
     }
