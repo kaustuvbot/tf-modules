@@ -13,8 +13,8 @@ locals {
 resource "google_compute_network" "this" {
   name                    = "vpc-${local.name_prefix}"
   auto_create_subnetworks = false
-  routing_mode           = var.routing_mode
-  mtu                    = var.mtu
+  routing_mode            = var.routing_mode
+  mtu                     = var.mtu
 
   labels = local.labels
 
@@ -27,9 +27,9 @@ resource "google_compute_subnetwork" "this" {
   for_each = var.subnets
 
   name                     = "subnet-${local.name_prefix}-${each.key}"
-  network                 = google_compute_network.this.id
-  region                 = each.value.region
-  ip_cidr_range          = each.value.ip_cidr_range
+  network                  = google_compute_network.this.id
+  region                   = each.value.region
+  ip_cidr_range            = each.value.ip_cidr_range
   private_ip_google_access = each.value.private_ip_google_access
 
   dynamic "secondary_ip_range" {
