@@ -48,12 +48,14 @@ jobs:
           - modules/aws/monitoring
           - modules/aws/budgets
           - modules/aws/eks
+          - modules/aws/ecr
           # Azure modules
           - modules/azure/resource-group
           - modules/azure/vnet
           - modules/azure/aks
           - modules/azure/key-vault
           - modules/azure/monitoring
+          - modules/azure/container-registry
           # Core modules
           - modules/core/naming
           - modules/core/tagging
