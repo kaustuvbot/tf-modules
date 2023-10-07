@@ -4,12 +4,18 @@
 # Enforces IMDSv2 and restricts metadata endpoint hop limit to 1 so that
 # pods cannot reach the instance metadata service directly.
 # Sets the root EBS volume size from node_groups[*].disk_size (default 50 GB).
+# Supports custom AMI IDs for Bottlerocket and hardened AL2 builds.
 # -----------------------------------------------------------------------------
 
 resource "aws_launch_template" "node" {
   for_each = var.node_groups
 
   name_prefix = "${local.cluster_name}-${each.key}-"
+
+  # When custom_ami_id is set on the node group, use it as the launch template
+  # image_id. The node group must also set ami_type = "CUSTOM" so EKS does not
+  # override this value. Set to null for standard AL2/Bottlerocket AMI types.
+  image_id = each.value.custom_ami_id
 
   # Configure the root EBS volume with the size specified in the node group
   # definition. Without this block the managed node group defaults to 20 GB,

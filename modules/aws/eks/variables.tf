@@ -62,6 +62,7 @@ variable "node_groups" {
     disk_size      = optional(number, 50)
     capacity_type  = optional(string, "ON_DEMAND")
     ami_type       = optional(string, "AL2_x86_64")
+    custom_ami_id  = optional(string, null)
     labels         = optional(map(string), {})
     taints = optional(list(object({
       key    = string
@@ -94,6 +95,16 @@ variable "node_groups" {
       ng.capacity_type != "SPOT" || length(ng.instance_types) >= 2
     ])
     error_message = "SPOT node groups must specify at least 2 instance_types for capacity pool diversification. AWS best practice: use 3+ types from different families."
+  }
+
+  # When custom_ami_id is set, ami_type must be CUSTOM so EKS does not attempt
+  # to override the launch template image_id with a managed AMI.
+  validation {
+    condition = alltrue([
+      for ng in values(var.node_groups) :
+      ng.custom_ami_id == null || ng.ami_type == "CUSTOM"
+    ])
+    error_message = "Set ami_type = \"CUSTOM\" on any node group that specifies custom_ami_id. Using a managed ami_type with a custom_ami_id causes EKS to override the image."
   }
 }
 
