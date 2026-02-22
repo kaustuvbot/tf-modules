@@ -59,6 +59,12 @@ jobs:
           # Core modules
           - modules/core/naming
           - modules/core/tagging
+          # GCP modules
+          - modules/gcp/vpc-network
+          - modules/gcp/iam
+          - modules/gcp/gke
+          - modules/gcp/cloudkms
+          - modules/gcp/storage
     steps:
       - name: Checkout
         uses: actions/checkout@v4
