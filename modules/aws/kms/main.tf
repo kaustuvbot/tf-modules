@@ -162,3 +162,52 @@ resource "aws_kms_alias" "general" {
   name          = "alias/${var.project}-${var.environment}-general"
   target_key_id = aws_kms_key.general[0].key_id
 }
+
+# -----------------------------------------------------------------------------
+# KMS Replica Keys (Multi-Region)
+# -----------------------------------------------------------------------------
+
+resource "aws_kms_replica_key" "logs" {
+  count = var.enable_logs_key && length(var.replica_regions) > 0 ? 1 : 0
+
+  primary_key_arn = aws_kms_key.logs[0].arn
+  description     = "Replica of ${var.project}-${var.environment} logs key in ${var.replica_regions[0]}"
+
+  deletion_window_in_days            = var.deletion_window_in_days
+  bypass_policy_lockout_safety_check = var.bypass_policy_lockout_safety_check
+
+  tags = merge(local.common_tags, {
+    Name    = "${var.project}-${var.environment}-logs-key-replica"
+    Purpose = "logs-encryption-replica"
+  })
+}
+
+resource "aws_kms_replica_key" "state" {
+  count = var.enable_state_key && length(var.replica_regions) > 0 ? 1 : 0
+
+  primary_key_arn = aws_kms_key.state[0].arn
+  description     = "Replica of ${var.project}-${var.environment} state key in ${var.replica_regions[0]}"
+
+  deletion_window_in_days            = var.deletion_window_in_days
+  bypass_policy_lockout_safety_check = var.bypass_policy_lockout_safety_check
+
+  tags = merge(local.common_tags, {
+    Name    = "${var.project}-${var.environment}-state-key-replica"
+    Purpose = "state-encryption-replica"
+  })
+}
+
+resource "aws_kms_replica_key" "general" {
+  count = var.enable_general_key && length(var.replica_regions) > 0 ? 1 : 0
+
+  primary_key_arn = aws_kms_key.general[0].arn
+  description     = "Replica of ${var.project}-${var.environment} general key in ${var.replica_regions[0]}"
+
+  deletion_window_in_days            = var.deletion_window_in_days
+  bypass_policy_lockout_safety_check = var.bypass_policy_lockout_safety_check
+
+  tags = merge(local.common_tags, {
+    Name    = "${var.project}-${var.environment}-general-key-replica"
+    Purpose = "general-encryption-replica"
+  })
+}

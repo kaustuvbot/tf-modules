@@ -53,6 +53,12 @@ variable "enable_key_rotation" {
   default     = true
 }
 
+variable "replica_regions" {
+  description = "List of regions to create KMS key replicas for cross-region access"
+  type        = list(string)
+  default     = []
+}
+
 variable "bypass_policy_lockout_safety_check" {
   description = "Bypass the KMS key policy lockout safety check when creating keys. Should remain false in all environments to prevent accidental lockout of the key management principal."
   type        = bool
