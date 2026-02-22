@@ -37,6 +37,14 @@ variable "repositories" {
   }
 }
 
+variable "replication_configuration" {
+  description = "Cross-region replication configuration for the registry"
+  type = object({
+    regions = list(string)
+  })
+  default = null
+}
+
 variable "tags" {
   description = "Additional tags to apply to all ECR resources"
   type        = map(string)

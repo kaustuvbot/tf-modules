@@ -19,6 +19,8 @@ locals {
   )
 }
 
+data "aws_caller_identity" "current" {}
+
 resource "aws_ecr_repository" "this" {
   for_each = var.repositories
 
@@ -74,4 +76,44 @@ resource "aws_ecr_lifecycle_policy" "this" {
       },
     ]
   })
+}
+
+resource "aws_ecr_registry_policy" "this" {
+  count = var.replication_configuration != null ? 1 : 0
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "Replication"
+        Effect = "Allow",
+        Principal = {
+          Service = "ecr.amazonaws.com"
+        },
+        Action = [
+          "ecr:BatchImportImage",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:PutImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload"
+        ],
+        Resource = "arn:aws:ecr:*:${data.aws_caller_identity.current.account_id}:repository/${var.project}/${var.environment}/*"
+      }
+    ]
+  })
+}
+
+resource "aws_ecr_replication_configuration" "this" {
+  count = var.replication_configuration != null ? 1 : 0
+
+  dynamic "rule" {
+    for_each = var.replication_configuration.regions
+    content {
+      destination {
+        region      = rule.value
+        registry_id = data.aws_caller_identity.current.account_id
+      }
+    }
+  }
 }
