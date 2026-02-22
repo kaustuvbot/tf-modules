@@ -58,3 +58,65 @@ resource "aws_s3_bucket_public_access_block" "state" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+resource "aws_s3_bucket_object_lock_configuration" "state" {
+  count = var.enable_object_lock ? 1 : 0
+
+  bucket = aws_s3_bucket.state.id
+
+  object_lock_enabled = "Enabled"
+
+  rule {
+    default_retention {
+      mode = "GOVERNANCE"
+      days = var.object_lock_retention_days
+    }
+  }
+}
+
+resource "aws_s3_bucket_intelligent_tiering_configuration" "state" {
+  count = var.enable_intelligent_tiering ? 1 : 0
+
+  bucket = aws_s3_bucket.state.id
+  name   = "terraform-state-tiering"
+
+  tiering {
+    access_tier = "INTELLIGENT_TIERING"
+    days        = 90
+  }
+
+  tiering {
+    access_tier = "ARCHIVE_ACCESS"
+    days        = 180
+  }
+
+  tiering {
+    access_tier = "DEEP_ARCHIVE_ACCESS"
+    days        = 365
+  }
+}
+
+resource "aws_s3_bucket_policy" "state" {
+  bucket = aws_s3_bucket.state.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "DenyNonTLSAccess"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.state.arn,
+          "${aws_s3_bucket.state.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}

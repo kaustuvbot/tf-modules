@@ -27,6 +27,24 @@ variable "kms_key_arn" {
   default     = null
 }
 
+variable "enable_object_lock" {
+  description = "Enable S3 Object Lock for WORM compliance. Bucket versioning must be enabled."
+  type        = bool
+  default     = false
+}
+
+variable "object_lock_retention_days" {
+  description = "Number of days to retain objects in Object Lock (requires enable_object_lock=true)"
+  type        = number
+  default     = 365
+}
+
+variable "enable_intelligent_tiering" {
+  description = "Enable S3 Intelligent-Tiering for cost optimization"
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Tags to apply to the S3 bucket"
   type        = map(string)
