@@ -25,3 +25,14 @@ variable "extra_tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "cloud_provider" {
+  description = "Cloud provider: aws, azure, or gcp"
+  type        = string
+  default     = "aws"
+
+  validation {
+    condition     = contains(["aws", "azure", "gcp"], var.cloud_provider)
+    error_message = "cloud_provider must be aws, azure, or gcp."
+  }
+}

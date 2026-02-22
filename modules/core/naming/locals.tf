@@ -1,18 +1,21 @@
 locals {
-  # Naming configuration
-  separator = "-"
+  # Naming configuration based on cloud provider
+  separator = var.cloud_provider == "gcp" ? "-" : "-"
 
-  # Build name parts, filtering out empty strings
+  # GCP names must be lowercase
   name_parts = compact([
-    var.project,
-    var.environment,
-    var.component,
-    var.suffix,
+    var.cloud_provider == "gcp" ? lower(var.project) : var.project,
+    var.cloud_provider == "gcp" ? lower(var.environment) : var.environment,
+    var.cloud_provider == "gcp" ? lower(var.component) : var.component,
+    var.cloud_provider == "gcp" ? lower(var.suffix) : var.suffix,
   ])
 
   # Standard resource name
   resource_name = join(local.separator, local.name_parts)
 
   # Short name variant (project-env) for use in constrained contexts
-  short_name = join(local.separator, compact([var.project, var.environment]))
+  short_name = join(local.separator, compact([
+    var.cloud_provider == "gcp" ? lower(var.project) : var.project,
+    var.cloud_provider == "gcp" ? lower(var.environment) : var.environment,
+  ]))
 }
